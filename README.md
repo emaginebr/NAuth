@@ -8,9 +8,11 @@
 
 ## Overview
 
-**NAuth** is a complete, modular authentication framework designed for fast and secure user management in modern web applications. Built using **.NET 8**, **React**, **Bootstrap**, and **PostgreSQL**, NAuth provides a robust solution for user registration, login, password recovery, and profile updates — ready to be integrated into any full-stack project.
+**NAuth.API** is the central backend of the NAuth ecosystem — a complete, modular authentication framework designed for fast and secure user management in modern web applications. Built using **.NET 8** and **PostgreSQL**, it provides a robust REST API for user registration, login, password recovery, role management, and profile updates.
 
-The project follows a clean architecture approach with separated layers for API, Application, Domain, Infrastructure, ACL (Anti-Corruption Layer), DTOs, and comprehensive test coverage.
+This is the **main project** of the NAuth ecosystem. All other NAuth packages ([NAuth.DTO](https://github.com/landim32/NAuth.DTO), [NAuth.ACL](https://github.com/landim32/NAuth.ACL), [NAuth.React](https://github.com/landim32/NAuth.React), [NAuth.App](https://github.com/landim32/NAuth.APP)) integrate with or consume this API.
+
+The project follows a clean architecture approach with separated layers for API, Application, Domain, Infrastructure, and comprehensive test coverage.
 
 ---
 
@@ -96,12 +98,27 @@ NAuth.API/
 └── README.md                # This file
 ```
 
-### Related Repositories
+### Ecosystem
 
-- [NAuth.DTO](https://github.com/landim32/NAuth.DTO) - Data Transfer Objects (NuGet package)
-- [NAuth.ACL](https://github.com/landim32/NAuth.ACL) - Anti-Corruption Layer (NuGet package)
-- [NAuth.APP](https://github.com/landim32/NAuth.APP) - Frontend React application
-- [NAuth.React](https://github.com/landim32/NAuth.React) - React component library (npm package)
+NAuth is a modular ecosystem. This repository (**NAuth.API**) is the central backend — the other packages integrate with it:
+
+| Project | Type | Package | Description |
+|---------|------|---------|-------------|
+| **[NAuth.DTO](https://github.com/landim32/NAuth.DTO)** | NuGet | [![NuGet](https://img.shields.io/nuget/v/NAuth.DTO.svg)](https://www.nuget.org/packages/NAuth.DTO/) | Shared Data Transfer Objects used across all .NET projects |
+| **[NAuth.ACL](https://github.com/landim32/NAuth.ACL)** | NuGet | [![NuGet](https://img.shields.io/nuget/v/NAuth.ACL.svg)](https://www.nuget.org/packages/NAuth.ACL/) | HTTP client library for consuming the NAuth API from .NET apps |
+| **[NAuth.React](https://github.com/landim32/NAuth.React)** | NPM | [![npm](https://img.shields.io/npm/v/nauth-react.svg)](https://www.npmjs.com/package/nauth-react) | React component library (login, register, user management) |
+| **[NAuth.App](https://github.com/landim32/NAuth.APP)** | App | — | Frontend web application built with NAuth.React |
+
+#### Dependency graph
+
+```
+NAuth.App (React frontend)
+  └─ nauth-react (NPM)
+       └─ NAuth.API (HTTP) ← you are here
+            ├─ NAuth.ACL (NuGet)
+            │   └─ NAuth.DTO (NuGet)
+            └─ NAuth.DTO (NuGet)
+```
 
 ---
 

@@ -29,7 +29,7 @@ branches:
     tag: pr
 commit-message-incrementing: Enabled
 major-version-bump-message: '^(major|breaking):'
-minor-version-bump-message: '^(feature|minor):'
+minor-version-bump-message: '^(feat|feature|minor):'
 patch-version-bump-message: '^(fix|patch):'
 no-bump-message: '\+semver:\s?(none|skip)'
 tag-prefix: '[vV]'

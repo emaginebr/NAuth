@@ -26,6 +26,26 @@ public partial class NAuthContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasSequence("role_id_seq")
+            .StartsAt(1)
+            .IncrementsBy(1);
+
+        modelBuilder.HasSequence("user_id_seq")
+            .StartsAt(1)
+            .IncrementsBy(1);
+
+        modelBuilder.HasSequence("user_addresses_id_seq")
+            .StartsAt(1)
+            .IncrementsBy(1);
+
+        modelBuilder.HasSequence("user_documents_id_seq")
+            .StartsAt(1)
+            .IncrementsBy(1);
+
+        modelBuilder.HasSequence("user_phones_id_seq")
+            .StartsAt(1)
+            .IncrementsBy(1);
+
         modelBuilder.Entity<Role>(entity =>
         {
             entity.HasKey(e => e.RoleId).HasName("roles_pkey");
