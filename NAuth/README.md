@@ -484,7 +484,7 @@ catch (Exception ex)
 - **Newtonsoft.Json** (13.0.3)
 - **Microsoft.AspNetCore.Authentication** (2.3.0)
 - **System.IdentityModel.Tokens.Jwt** (8.15.0)
-- **NTools.ACL** (0.2.0)
+- **zTools** (latest)
 
 ## Best Practices
 

@@ -7,7 +7,25 @@
       "Skill(doc-controller:*)",
       "Bash(dotnet ef:*)",
       "Bash(dotnet add:*)",
-      "Bash(dotnet build:*)"
+      "Bash(dotnet build:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfix: update repository URLs and ecosystem references to emaginebr/NAuth\n\nReplace all landim32 references with emaginebr org. Simplify ecosystem\nsection to only reference nauth-react, since DTO and ACL are now\nin-solution packages.\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(gh pr create --title \"feat: join DTO and ACL packages + update repo URLs\" --body \"$\\(cat <<''EOF''\n## Summary\n- Unified NAuth.DTO and NAuth.ACL into a single in-solution `NAuth` project \\(also published as NuGet package\\)\n- Added GitHub Actions workflow for NuGet publishing \\(`publish-nuget.yml`\\)\n- Updated all repository URLs and references from `landim32` to `emaginebr/NAuth`\n- Simplified README ecosystem section to only reference `nauth-react`\n\n## Test plan\n- [ ] Verify `dotnet build` succeeds with the unified NAuth project\n- [ ] Verify `dotnet test` passes\n- [ ] Confirm NuGet package builds correctly with `GeneratePackageOnBuild`\n- [ ] Validate all README links point to `emaginebr/NAuth` and `emaginebr/nauth-react`\n- [ ] Check SonarCloud badges resolve with new project ID `emaginebr_NAuth`\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\nEOF\n\\)\")",
+      "Bash(where:*)",
+      "Bash(where.exe:*)",
+      "Bash(dotnet restore:*)",
+      "Bash(dotnet nuget:*)",
+      "Bash(dir:*)",
+      "Bash(dotnet tool list:*)",
+      "Bash(findstr:*)",
+      "Bash(powershell -Command \"[System.Reflection.Assembly]::LoadFrom\\(''C:\\\\Users\\\\rodri\\\\.nuget\\\\packages\\\\ztools\\\\0.3.1\\\\lib\\\\net8.0\\\\zTools.dll''\\).GetTypes\\(\\) | ForEach-Object { $_FullName } | Sort-Object\")",
+      "Bash(powershell:*)",
+      "Bash(dotnet script eval:*)",
+      "Bash(dotnet new:*)",
+      "Bash(dotnet run:*)",
+      "Bash(dotnet test:*)",
+      "Bash(git stash:*)"
     ]
   }
 }

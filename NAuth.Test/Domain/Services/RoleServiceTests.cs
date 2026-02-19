@@ -6,7 +6,7 @@ using NAuth.Domain.Factory.Interfaces;
 using NAuth.Domain.Models.Models;
 using NAuth.Domain.Services;
 using NAuth.DTO.User;
-using NTools.ACL.Interfaces;
+using zTools.ACL.Interfaces;
 using Xunit;
 
 namespace NAuth.Test.Domain.Services

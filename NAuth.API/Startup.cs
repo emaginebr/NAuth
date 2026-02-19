@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using NAuth.Application;
 using NAuth.DTO.Settings;
-using NTools.DTO.Settings;
+using zTools.DTO.Settings;
 using System;
 using System.Net.Mime;
 using System.Text.Json;
@@ -29,7 +29,7 @@ namespace NAuth.API
         {
             services.Configure<MailerSendSetting>(Configuration.GetSection("MailerSend"));
             services.Configure<NAuthSetting>(Configuration.GetSection("NAuth"));
-            services.Configure<NToolSetting>(Configuration.GetSection("NTools"));
+            services.Configure<zToolsetting>(Configuration.GetSection("zTools"));
 
             services.AddHttpClient();
 

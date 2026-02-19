@@ -8,7 +8,7 @@ using NAuth.Domain.Services;
 using NAuth.DTO.Settings;
 using NAuth.DTO.User;
 using NAuth.Infra.Interfaces;
-using NTools.ACL.Interfaces;
+using zTools.ACL.Interfaces;
 using Xunit;
 
 namespace NAuth.Test.Domain.Services

@@ -12,8 +12,8 @@ using NAuth.Infra.Context;
 using NAuth.Infra.Interfaces;
 using NAuth.Infra.Interfaces.Repository;
 using NAuth.Infra.Repository;
-using NTools.ACL;
-using NTools.ACL.Interfaces;
+using zTools.ACL;
+using zTools.ACL.Interfaces;
 using System;
 
 namespace NAuth.Application

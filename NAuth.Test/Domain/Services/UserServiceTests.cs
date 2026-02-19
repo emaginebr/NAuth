@@ -9,8 +9,8 @@ using NAuth.Domain.Models.Models;
 using NAuth.Domain.Services;
 using NAuth.DTO.Settings;
 using NAuth.Infra.Interfaces;
-using NTools.ACL.Interfaces;
-using NTools.DTO.MailerSend;
+using zTools.ACL.Interfaces;
+using zTools.DTO.MailerSend;
 using System.Security.Claims;
 using Xunit;
 
