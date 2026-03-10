@@ -5,5 +5,6 @@ namespace NAuth.DTO.Settings
         public string ApiUrl { get; set; }
         public string BucketName { get; set; }
         public string JwtSecret { get; set; }
+        public string TenantId { get; set; }
     }
 }

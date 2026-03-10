@@ -18,6 +18,9 @@ namespace NAuth.ACL
             _httpClient = httpClient;
             _nauthSetting = nauthSetting;
             _logger = logger;
+
+            if (!string.IsNullOrEmpty(nauthSetting.Value.TenantId))
+                _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("X-Tenant-Id", nauthSetting.Value.TenantId);
         }
 
         public async Task<IList<RoleInfo>> ListAsync()

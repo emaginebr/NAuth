@@ -7,9 +7,6 @@
 .env
 .env.prod
 
-# Production settings (contains secrets injected by CI/CD)
-**/appsettings.Production.json
-
 # User-specific files
 *.rsuser
 *.suo
