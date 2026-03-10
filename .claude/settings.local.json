@@ -27,7 +27,10 @@
       "Bash(dotnet test:*)",
       "Bash(git stash:*)",
       "Bash(dotnet list:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(openssl rand:*)",
+      "Bash(git check-ignore:*)",
+      "Bash(find /c/repos/NAuth/NAuth/docs -type f -name \"*.md\" 2>/dev/null | xargs grep -l \"nauth\" 2>/dev/null)"
     ]
   }
 }

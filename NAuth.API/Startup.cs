@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
@@ -6,10 +7,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using NAuth.API.Handlers;
 using NAuth.API.Middlewares;
 using NAuth.API.Services;
 using NAuth.Application;
-using NAuth.DTO.Settings;
 using NAuth.Infra.Context;
 using NAuth.Infra.Interfaces;
 using zTools.DTO.Settings;
@@ -32,7 +33,6 @@ namespace NAuth.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<MailerSendSetting>(Configuration.GetSection("MailerSend"));
-            services.Configure<NAuthSetting>(Configuration.GetSection("NAuth"));
             services.Configure<zToolsetting>(Configuration.GetSection("zTools"));
 
             // Tenant services
@@ -52,6 +52,9 @@ namespace NAuth.API
             services.AddHttpClient();
 
             Initializer.Configure(services, Configuration);
+
+            services.AddAuthentication("BasicAuthentication")
+                .AddScheme<AuthenticationSchemeOptions, MultiTenantHandler>("BasicAuthentication", null);
 
             services.AddControllers();
             services.AddHealthChecks();

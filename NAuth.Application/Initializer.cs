@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NAuth.ACL;
 using NAuth.Domain.Factory;
 using NAuth.Domain.Factory.Interfaces;
 using NAuth.Domain.Models.Models;
@@ -81,10 +79,6 @@ namespace NAuth.Application
             injectDependency(typeof(IUserService), typeof(UserService), services, scoped);
             injectDependency(typeof(IRoleService), typeof(RoleService), services, scoped);
             #endregion
-
-
-            services.AddAuthentication("BasicAuthentication")
-                .AddScheme<AuthenticationSchemeOptions, NAuthHandler>("BasicAuthentication", null);
 
         }
     }

@@ -13,7 +13,7 @@ jobs:
       with:
         host: ${{ secrets.PROD_SSH_HOST }}
         username: ${{ secrets.PROD_SSH_USER }}
-        key: ${{ secrets.PROD_SSH_KEY }}
+        password: ${{ secrets.PROD_SSH_PASSWORD }}
         port: ${{ secrets.PROD_SSH_PORT || 22 }}
         script: |
           set -e
@@ -35,50 +35,31 @@ jobs:
             cd "$DEPLOY_DIR"
           fi
 
-          # Inject .env from GitHub Secrets
-          cat > .env <<'ENVEOF'
-          # PostgreSQL
-          POSTGRES_DB=${{ secrets.PROD_POSTGRES_DB }}
-          POSTGRES_USER=${{ secrets.PROD_POSTGRES_USER }}
-          POSTGRES_PASSWORD=${{ secrets.PROD_POSTGRES_PASSWORD }}
-          POSTGRES_PORT=${{ secrets.PROD_POSTGRES_PORT }}
-
-          # Tenant Databases
-          NAUTH_DB=${{ secrets.PROD_NAUTH_DB }}
-          VIRALT_DB=${{ secrets.PROD_VIRALT_DB }}
-
-          # Default Tenant
-          DEFAULT_TENANT_ID=${{ secrets.PROD_DEFAULT_TENANT_ID }}
-
-          # JWT
-          JWT_SECRET=${{ secrets.PROD_JWT_SECRET }}
-          NAUTH_JWT_SECRET=${{ secrets.PROD_NAUTH_JWT_SECRET }}
-          VIRALT_JWT_SECRET=${{ secrets.PROD_VIRALT_JWT_SECRET }}
-
-          # API
-          API_HTTP_PORT=${{ secrets.PROD_API_HTTP_PORT }}
-          API_HTTPS_PORT=${{ secrets.PROD_API_HTTPS_PORT }}
-          CERTIFICATE_PASSWORD=${{ secrets.PROD_CERTIFICATE_PASSWORD }}
-
-          # External Services
-          ZTOOL_API_URL=${{ secrets.PROD_ZTOOL_API_URL }}
-          BUCKET_NAME=${{ secrets.PROD_BUCKET_NAME }}
+          # Inject .env.prod from GitHub Secrets (UPPER_SNAKE_CASE)
+          cat > .env.prod <<'ENVEOF'
+          CERTIFICATE_PASSWORD=${{ secrets.CERTIFICATE_PASSWORD }}
+          EMAGINE_CONNECTION_STRING=${{ secrets.EMAGINE_CONNECTION_STRING }}
+          EMAGINE_JWT_SECRET=${{ secrets.EMAGINE_JWT_SECRET }}
+          VIRALT_CONNECTION_STRING=${{ secrets.VIRALT_CONNECTION_STRING }}
+          VIRALT_JWT_SECRET=${{ secrets.VIRALT_JWT_SECRET }}
+          DEVBLOG_CONNECTION_STRING=${{ secrets.DEVBLOG_CONNECTION_STRING }}
+          DEVBLOG_JWT_SECRET=${{ secrets.DEVBLOG_JWT_SECRET }}
           ENVEOF
 
-          # Remove leading whitespace from .env
-          sed -i 's/^[[:space:]]*//' .env
+          # Remove leading whitespace from .env.prod
+          sed -i 's/^[[:space:]]*//' .env.prod
 
           # Create external network if it doesn't exist
           docker network inspect emagine-network >/dev/null 2>&1 || docker network create emagine-network
 
           # Deploy with docker compose
-          docker compose -f docker-compose-prod.yml down
-          docker compose -f docker-compose-prod.yml up --build -d
+          docker compose --env-file .env.prod -f docker-compose-prod.yml down
+          docker compose --env-file .env.prod -f docker-compose-prod.yml up --build -d
 
           # Wait and verify
           echo "Waiting for services to start..."
           sleep 10
-          docker compose -f docker-compose-prod.yml ps
+          docker compose --env-file .env.prod -f docker-compose-prod.yml ps
 
           echo "Deployment completed successfully."
 

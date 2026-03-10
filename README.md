@@ -1,16 +1,15 @@
-# NAuth.API - Authentication Framework
+# NAuth.API - Multi-Tenant Authentication Framework
 
 ![.NET](https://img.shields.io/badge/.NET-8.0-blue)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=emaginebr_NAuth&metric=alert_status)](https://sonarcloud.io/project/overview?id=emaginebr_NAuth)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=emaginebr_NAuth&metric=coverage)](https://sonarcloud.io/project/overview?id=emaginebr_NAuth)
-[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=emaginebr_NAuth&metric=code_smells)](https://sonarcloud.io/project/overview?id=emaginebr_NAuth)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ## Overview
 
 **NAuth.API** is the central backend of the NAuth ecosystem — a complete, modular authentication framework designed for fast and secure user management in modern web applications. Built using **.NET 8** and **PostgreSQL**, it provides a robust REST API for user registration, login, password recovery, role management, and profile updates.
 
-This is the **main project** of the NAuth ecosystem. The frontend component library [nauth-react](https://github.com/emaginebr/nauth-react) integrates with and consumes this API.
+The project supports **multi-tenant architecture** with database-per-tenant isolation, where each tenant has its own PostgreSQL database, JWT secret, and S3 bucket. Tenant resolution happens via JWT claims or HTTP headers.
+
+This is the **main project** of the NAuth ecosystem. The frontend component library [nauth-react](https://github.com/emaginebr/nauth-react) integrates with and consumes this API. The DTO and ACL packages are included in-solution under the `NAuth` project (also published as a NuGet package).
 
 The project follows a clean architecture approach with separated layers for API, Application, Domain, Infrastructure, and comprehensive test coverage.
 
@@ -19,17 +18,20 @@ The project follows a clean architecture approach with separated layers for API,
 ## 🚀 Features
 
 - 🔐 **User Registration** - Complete registration flow with email confirmation
-- 🔑 **JWT Authentication** - Secure token-based authentication
+- 🔑 **JWT Authentication** - Secure token-based authentication with per-tenant secrets
+- 🏢 **Multi-Tenant** - Database-per-tenant isolation with independent JWT secrets and S3 buckets
 - 🔄 **Password Recovery** - Secure password reset via email with token validation
 - ✏️ **Profile Management** - User profile update and password change
 - 👥 **Role-Based Access Control** - User roles and permissions management
-- 📧 **Email Integration** - Email templates and SMTP support
+- 📧 **Email Integration** - Email templates via MailerSend
 - 🗄️ **PostgreSQL Database** - Schema and migrations included
-- 📦 **Modular Architecture** - Reusable across multiple projects
+- 📦 **Modular Architecture** - Reusable across multiple projects via NuGet package
 - 🌐 **REST API** - Complete RESTful API with Swagger documentation
-- 🐳 **Docker Support** - Production-ready Docker configurations
+- 🐳 **Docker Support** - Dev and production Docker Compose configurations
 - ✅ **Health Checks** - Built-in health check endpoints
 - 🔒 **Security** - Non-root containers, encrypted passwords, token validation
+- 🖼️ **Image Processing** - Profile image upload and processing
+- 💳 **Payment Integration** - Stripe payment processing support
 
 ---
 
@@ -38,69 +40,80 @@ The project follows a clean architecture approach with separated layers for API,
 ### Core Framework
 - **.NET 8.0** - Modern, cross-platform framework for building web APIs
 - **ASP.NET Core** - Web framework for building HTTP services
-- **Entity Framework Core 9.0.8** - ORM with proxy support
+- **Entity Framework Core 9.0** - ORM with lazy loading proxies
 
 ### Database
-- **PostgreSQL** - Robust relational database
-- **Npgsql.EntityFrameworkCore.PostgreSQL 9.0.8** - PostgreSQL provider for EF Core
+- **PostgreSQL 16** - Robust relational database
+- **Npgsql.EntityFrameworkCore.PostgreSQL 9.0** - PostgreSQL provider for EF Core
 
 ### Security
-- **JWT (JSON Web Tokens)** - Secure authentication mechanism
-- **PBKDF2/BCrypt** - Strong password hashing algorithms
+- **JWT (JSON Web Tokens)** - Secure authentication with per-tenant signing keys
+- **BCrypt.Net-Next 4.0** - Strong password hashing
 - **Token-based Email Verification** - Secure email confirmation and password reset
 
-### Frontend Integration
-- **React** - Modern UI library
-- **Bootstrap** - Responsive UI components
-- **React Hooks** - Custom authentication hooks
-
 ### Additional Libraries
-- **Swashbuckle.AspNetCore 9.0.4** - Swagger/OpenAPI documentation
-- **MailerSend Integration** - Email delivery service
+- **Swashbuckle.AspNetCore 9.0** - Swagger/OpenAPI documentation
+- **AWSSDK.S3** - Amazon S3 file storage (per-tenant buckets)
+- **Stripe.net** - Payment processing integration
+- **SixLabors.ImageSharp** - Image processing
+- **Newtonsoft.Json** - JSON serialization
 
 ### Testing
-- **xUnit** - Unit testing framework
-- Comprehensive test coverage across all layers
+- **xUnit 2.4** - Unit testing framework
+- **Moq 4.20** - Mocking framework
+- **Coverlet** - Code coverage
+- **EF Core InMemory** - In-memory database for tests
 
 ### DevOps
 - **Docker** - Containerization with multi-stage builds
-- **Docker Compose** - Multi-container orchestration
-- **GitHub Actions** - CI/CD pipeline
+- **Docker Compose** - Dev and production orchestration
+- **GitHub Actions** - CI/CD pipelines (version tagging, NuGet publish, production deploy)
+- **GitVersion** - Semantic versioning (ContinuousDelivery mode)
 
 ---
 
 ## 📁 Project Structure
 
 ```
-NAuth.API/
-├── NAuth.API/                # Web API layer with controllers
-│   ├── Controllers/          # API endpoints (User, Role, etc.)
-│   ├── appsettings.*.json   # Configuration files
-│   └── Startup.cs           # Application configuration
-├── NAuth.Application/        # Application layer with DI setup
-│   └── Initializer.cs       # Dependency injection configuration
-├── NAuth.Domain/            # Domain layer with business logic
-│   ├── Models/              # Domain models
-│   ├── Services/            # Business logic services
-│   ├── Factory/             # Domain factories
-│   └── LocalAuthHandler.cs  # Local authentication handler
-├── NAuth.Infra/             # Infrastructure layer
-│   ├── Context/             # Database context
-│   └── Repository/          # Data access repositories
-├── NAuth.Infra.Interfaces/  # Repository interfaces
-├── NAuth.Test/              # Comprehensive test suite
-│   ├── Domain/              # Domain tests
-│   ├── Infra/               # Infrastructure tests
-│   └── ACL/                 # ACL tests
-├── Dockerfile               # Production-ready Docker image
-├── docker-compose.yml       # Docker Compose configuration
-├── postgres.Dockerfile      # PostgreSQL container
-└── README.md                # This file
+NAuth/
+├── NAuth.API/                    # Web API layer
+│   ├── Controllers/              # API endpoints (User, Role)
+│   ├── Handlers/                 # MultiTenantHandler (JWT auth per tenant)
+│   ├── Middlewares/               # TenantMiddleware (X-Tenant-Id header)
+│   ├── Services/                  # TenantResolver, TenantDbContextFactory, TenantContext
+│   ├── appsettings.*.json         # Configuration per environment
+│   └── Startup.cs                 # Application configuration and DI
+├── NAuth.Application/             # Application layer
+│   └── Initializer.cs             # Dependency injection composition root
+├── NAuth.Domain/                  # Domain layer with business logic
+│   ├── Models/                    # Domain models
+│   ├── Services/                  # UserService, RoleService
+│   ├── Factory/                   # UserDomainFactory, RoleDomainFactory
+│   └── Exceptions/                # Custom domain exceptions
+├── NAuth.Infra/                   # Infrastructure layer
+│   ├── Context/                   # NAuthContext (EF Core)
+│   ├── Repository/                # Data access repositories
+│   └── Migrations/                # EF Core migrations
+├── NAuth.Infra.Interfaces/        # Repository and model interfaces
+│   └── ITenantContext.cs           # Tenant context interface
+├── NAuth/                         # NuGet package (DTOs + ACL)
+│   ├── DTO/                       # Data transfer objects
+│   └── ACL/                       # NAuthHandler, UserClient, RoleClient
+├── NAuth.Test/                    # Test suite
+│   ├── Domain/                    # Domain model and service tests
+│   ├── Infra/                     # Repository tests (EF InMemory)
+│   ├── ACL/                       # Auth handler and client tests
+│   └── Tenant/                    # Tenant resolution tests
+├── docs/                          # Documentation
+├── docker-compose-dev.yml         # Development (single tenant + PostgreSQL)
+├── docker-compose-prod.yml        # Production (multi-tenant, external DB)
+├── Dockerfile                     # Multi-stage .NET build
+├── postgres.Dockerfile            # Dev PostgreSQL with schema
+├── nauth.sql                      # Database schema
+└── README.md                      # This file
 ```
 
 ### Ecosystem
-
-NAuth is a modular ecosystem. This repository (**NAuth.API**) is the central backend. The DTO and ACL packages are included in-solution under the `NAuth` project (also published as a NuGet package).
 
 | Project | Type | Package | Description |
 |---------|------|---------|-------------|
@@ -116,129 +129,208 @@ nauth-react (NPM)
 
 ---
 
+## 🏢 Multi-Tenant Architecture
+
+NAuth supports **database-per-tenant** isolation. Each tenant has its own PostgreSQL database, JWT signing secret, and S3 bucket name.
+
+### How It Works
+
+```
+Request → TenantMiddleware → Resolve Tenant → TenantDbContextFactory → Tenant Database
+```
+
+1. **Authenticated requests**: Tenant is read from the `tenant_id` claim in the JWT token
+2. **Non-authenticated requests**: Tenant is read from the `X-Tenant-Id` HTTP header
+3. **Fallback**: Uses `Tenant:DefaultTenantId` from configuration
+4. **NuGet package (ACL)**: Uses global `NAuthSetting.JwtSecret` — no tenant awareness
+
+### Configuration
+
+Tenants are configured in `appsettings.json` (or injected via environment variables in Docker):
+
+```json
+{
+  "Tenant": {
+    "DefaultTenantId": "emagine"
+  },
+  "Tenants": {
+    "emagine": {
+      "ConnectionString": "Host=localhost;Port=5432;Database=emagine_db;Username=...",
+      "JwtSecret": "your_emagine_jwt_secret_at_least_64_characters_long",
+      "BucketName": "Emagine"
+    },
+    "viralt": {
+      "ConnectionString": "Host=localhost;Port=5432;Database=viralt_db;Username=...",
+      "JwtSecret": "your_viralt_jwt_secret_at_least_64_characters_long",
+      "BucketName": "Viralt"
+    },
+    "devblog": {
+      "ConnectionString": "Host=localhost;Port=5432;Database=devblog_db;Username=...",
+      "JwtSecret": "your_devblog_jwt_secret_at_least_64_characters_long",
+      "BucketName": "DevBlog"
+    }
+  }
+}
+```
+
+### Current Tenants
+
+| Tenant | BucketName | Description |
+|--------|------------|-------------|
+| `emagine` | Emagine | Default tenant |
+| `viralt` | Viralt | Viralt platform |
+| `devblog` | DevBlog | DevBlog platform |
+
+### Key Components
+
+| Component | Layer | Responsibility |
+|-----------|-------|----------------|
+| `MultiTenantHandler` | NAuth.API | Resolves JWT secret per tenant for authentication |
+| `TenantMiddleware` | NAuth.API | Reads `X-Tenant-Id` header, sets `ITenantContext` |
+| `TenantResolver` | NAuth.API | Reads tenant config from `Tenants:{id}:*` in appsettings |
+| `TenantDbContextFactory` | NAuth.API | Creates `NAuthContext` with tenant-specific connection string |
+| `ITenantContext` | NAuth.Infra.Interfaces | Scoped interface exposing current `TenantId` |
+| `UserService` | NAuth.Domain | Resolves JWT secret and BucketName per tenant (throws if not configured) |
+| `NAuthHandler` | NAuth (package) | Uses global `NAuthSetting.JwtSecret` (no multi-tenant) |
+
+---
+
 ## ⚙️ Environment Configuration
 
-Before running the application, you need to configure the environment variables:
-
-### 1. Copy the environment template
+### Development
 
 ```bash
 cp .env.example .env
 ```
 
-### 2. Edit the `.env` file
+Edit the `.env` file:
 
 ```bash
-# PostgreSQL Database Configuration
-POSTGRES_DB=nauth_db
-POSTGRES_USER=nauth
-POSTGRES_PASSWORD=your_secure_password_here_change_this
+# PostgreSQL Container
+POSTGRES_DB=emagine_db
+POSTGRES_USER=emagine_user
+POSTGRES_PASSWORD=your_secure_password_here
 POSTGRES_PORT=5432
 
-# Connection String
-# Use 'nauth-postgres' when running with Docker Compose
-CONNECTION_STRING=Host=nauth-postgres;Port=5432;Database=nauth_db;Username=nauth;Password=your_secure_password_here_change_this
-
-# JWT Configuration (minimum 64 characters)
-JWT_SECRET=your_jwt_secret_with_at_least_64_characters_for_maximum_security_change_this_value
-
-# NAuth API Configuration
+# NAuth API Ports
 API_HTTP_PORT=5004
 API_HTTPS_PORT=5005
 CERTIFICATE_PASSWORD=your_certificate_password_here
+
+# External Services
+ZTOOL_API_URL=http://ztools-api:8080
 ```
 
-⚠️ **IMPORTANT**: 
-- Never commit the `.env` file with real credentials
-- Only the `.env.example` should be version controlled
-- Change all default passwords and secrets before deployment
-- JWT_SECRET must be at least 64 characters for security
+### Production
+
+```bash
+cp .env.prod.example .env.prod
+```
+
+Edit the `.env.prod` file:
+
+```bash
+# HTTPS Certificate
+CERTIFICATE_PASSWORD=your_certificate_password_here
+
+# Tenant: emagine
+EMAGINE_CONNECTION_STRING=Host=your_db_host;Port=5432;Database=emagine_db;Username=your_user;Password=your_password
+EMAGINE_JWT_SECRET=your_emagine_jwt_secret_at_least_64_characters_long
+
+# Tenant: viralt
+VIRALT_CONNECTION_STRING=Host=your_db_host;Port=5432;Database=viralt_db;Username=your_user;Password=your_password
+VIRALT_JWT_SECRET=your_viralt_jwt_secret_at_least_64_characters_long
+
+# Tenant: devblog
+DEVBLOG_CONNECTION_STRING=Host=your_db_host;Port=5432;Database=devblog_db;Username=your_user;Password=your_password
+DEVBLOG_JWT_SECRET=your_devblog_jwt_secret_at_least_64_characters_long
+```
+
+⚠️ **IMPORTANT**:
+- Never commit `.env` or `.env.prod` files with real credentials
+- Only `.env.example` and `.env.prod.example` are version controlled
+- JWT secrets must be at least 64 characters for HMAC-SHA256
+- Production `BucketName` values are configured in `appsettings.Production.json`, not in `.env.prod`
 
 ---
 
 ## 🐳 Docker Setup
 
-### Quick Start with Docker Compose
+The project provides two Docker Compose configurations:
 
-#### 1. Create Docker Network
+| File | Purpose | Database | Tenants |
+|------|---------|----------|---------|
+| `docker-compose-dev.yml` | Development | Included (PostgreSQL container) | Single tenant |
+| `docker-compose-prod.yml` | Production | External (connection strings in `.env.prod`) | Multi-tenant (emagine + viralt + devblog) |
+
+### Prerequisites
 
 ```bash
+# Create the external Docker network
 docker network create emagine-network
 ```
 
-Or remove the `external: true` configuration from `docker-compose.yml` if you don't need an external network.
-
-#### 2. Build and Start Services
+### Development
 
 ```bash
-docker-compose up -d --build
+docker compose -f docker-compose-dev.yml up -d --build
 ```
 
-This command will:
-- Build the Docker images for both API and PostgreSQL
-- Create and start the containers
-- Set up networking between containers
-- Apply health checks
+Uses `postgres.Dockerfile` which applies `nauth.sql` to a single database.
 
-#### 3. Verify Deployment
+### Production (Multi-Tenant)
 
-Check container status:
 ```bash
-docker-compose ps
+docker compose --env-file .env.prod -f docker-compose-prod.yml up -d --build
 ```
 
-View logs:
+Production uses **external databases** — no PostgreSQL container is created. Connection strings for each tenant are provided via `.env.prod`.
+
+The API container receives per-tenant configuration via environment variables:
+```yaml
+Tenants__emagine__ConnectionString: ${EMAGINE_CONNECTION_STRING}
+Tenants__emagine__JwtSecret: ${EMAGINE_JWT_SECRET}
+Tenants__viralt__ConnectionString: ${VIRALT_CONNECTION_STRING}
+Tenants__viralt__JwtSecret: ${VIRALT_JWT_SECRET}
+Tenants__devblog__ConnectionString: ${DEVBLOG_CONNECTION_STRING}
+Tenants__devblog__JwtSecret: ${DEVBLOG_JWT_SECRET}
+```
+
+### Verify Deployment
+
 ```bash
-# All services
-docker-compose logs -f
+# Check container status
+docker compose -f docker-compose-prod.yml ps
 
-# API only
-docker-compose logs -f nauth-api
+# View logs
+docker compose -f docker-compose-prod.yml logs -f
 
-# PostgreSQL only
-docker-compose logs -f postgres
+# Test health check
+curl http://localhost:5004/
 ```
 
 ### Accessing the Application
 
-After deployment, the services will be available at:
-
-- **Frontend App**: http://localhost:5006
-- **API HTTP**: http://localhost:5004
-- **API HTTPS**: https://localhost:5005
-- **Swagger UI**: http://localhost:5004/swagger
-- **Health Check**: http://localhost:5004/ (returns JSON with application status)
-- **PostgreSQL**: localhost:5432 (accessible from host machine)
+| Service | URL |
+|---------|-----|
+| **API HTTP** | http://localhost:5004 |
+| **API HTTPS** | https://localhost:5005 |
+| **Swagger UI** | http://localhost:5004/swagger |
+| **Health Check** | http://localhost:5004/ |
+| **PostgreSQL** (dev only) | localhost:5432 |
 
 ### Docker Compose Commands
 
 | Action | Command |
 |--------|---------|
-| Start services | `docker-compose up -d` |
-| Start with rebuild | `docker-compose up -d --build` |
-| Stop services | `docker-compose stop` |
-| Restart services | `docker-compose restart` |
-| View status | `docker-compose ps` |
-| View all logs | `docker-compose logs -f` |
-| View API logs | `docker-compose logs -f nauth-api` |
-| View DB logs | `docker-compose logs -f postgres` |
-| Remove containers | `docker-compose down` |
-| Remove containers and volumes (⚠️ deletes data) | `docker-compose down -v` |
-
-### Production Deployment
-
-For production environments, use the production configuration:
-
-```bash
-docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
-```
-
-The production configuration includes:
-- Resource limits and reservations
-- Rolling update strategy
-- Enhanced security settings
-- Optimized logging
-- Health check configurations
+| Start dev | `docker compose -f docker-compose-dev.yml up -d` |
+| Start prod | `docker compose --env-file .env.prod -f docker-compose-prod.yml up -d` |
+| Start with rebuild | `docker compose --env-file .env.prod -f docker-compose-prod.yml up -d --build` |
+| Stop services | `docker compose -f docker-compose-prod.yml stop` |
+| View status | `docker compose -f docker-compose-prod.yml ps` |
+| View logs | `docker compose -f docker-compose-prod.yml logs -f` |
+| Remove containers | `docker compose -f docker-compose-prod.yml down` |
+| Remove containers and volumes (⚠️) | `docker compose -f docker-compose-prod.yml down -v` |
 
 ---
 
@@ -247,47 +339,58 @@ The production configuration includes:
 ### Prerequisites
 - .NET 8.0 SDK
 - PostgreSQL 12+
-- Node.js 16+ (for frontend)
 
-### Backend Setup
+### Setup Steps
 
-#### 1. Configure Database
+#### 1. Create Tenant Databases
 
-Create a PostgreSQL database and update the connection string in `NAuth.API/appsettings.Development.json`:
+Create one PostgreSQL database per tenant and apply the schema:
+
+```bash
+psql -U postgres -c "CREATE DATABASE emagine_db;"
+psql -U postgres -d emagine_db -f nauth.sql
+
+psql -U postgres -c "CREATE DATABASE viralt_db;"
+psql -U postgres -d viralt_db -f nauth.sql
+
+psql -U postgres -c "CREATE DATABASE devblog_db;"
+psql -U postgres -d devblog_db -f nauth.sql
+```
+
+#### 2. Configure appsettings
+
+Update `NAuth.API/appsettings.Development.json` with your tenant configuration:
 
 ```json
 {
-  "ConnectionStrings": {
-    "NAuthContext": "Host=localhost;Port=5432;Database=nauth_db;Username=nauth;Password=your_password"
+  "Tenant": {
+    "DefaultTenantId": "emagine"
+  },
+  "Tenants": {
+    "emagine": {
+      "ConnectionString": "Host=localhost;Port=5432;Database=emagine_db;Username=postgres;Password=your_password",
+      "JwtSecret": "your_emagine_jwt_secret_at_least_64_characters",
+      "BucketName": "Emagine"
+    },
+    "viralt": {
+      "ConnectionString": "Host=localhost;Port=5432;Database=viralt_db;Username=postgres;Password=your_password",
+      "JwtSecret": "your_viralt_jwt_secret_at_least_64_characters",
+      "BucketName": "Viralt"
+    },
+    "devblog": {
+      "ConnectionString": "Host=localhost;Port=5432;Database=devblog_db;Username=postgres;Password=your_password",
+      "JwtSecret": "your_devblog_jwt_secret_at_least_64_characters",
+      "BucketName": "DevBlog"
+    }
   }
 }
 ```
 
-#### 2. Configure JWT Settings
-
-Update JWT configuration in `NAuth.API/appsettings.Development.json`:
-
-```json
-{
-  "NAuth": {
-    "JwtSecret": "your_jwt_secret_at_least_64_characters_long"
-  }
-}
-```
-
-#### 3. Run Database Migrations
+#### 3. Build and Run
 
 ```bash
-cd NAuth.Infra
-dotnet ef database update --startup-project ../NAuth.API
-```
-
-#### 4. Start the API
-
-```bash
-cd NAuth.API
-dotnet restore
-dotnet run
+dotnet build
+dotnet run --project NAuth.API
 ```
 
 The API will be available at:
@@ -295,373 +398,9 @@ The API will be available at:
 - HTTPS: https://localhost:5005
 - Swagger: http://localhost:5004/swagger
 
-### Frontend Setup
-
-#### 1. Install Dependencies
-
-```bash
-cd Frontend/nauth-app
-npm install
-```
-
-#### 2. Configure API URL
-
-Update the API URL in your frontend configuration to point to your backend.
-
-#### 3. Start the Frontend
-
-```bash
-npm start
-```
-
-### Updating nauth-core Hook
-
-When making changes to the `Frontend/nauth-core` library:
-
-```bash
-cd Frontend/nauth-app
-npm install --legacy-peer-deps ../nauth-core
-```
-
----
-
-## 📚 API Documentation
-
-The NAuth API provides comprehensive endpoints for user authentication and management.
-
-### Authentication Flow
-
-```
-1. Register → 2. Verify Email → 3. Login → 4. Access Protected Resources
-```
-
-### User Controller
-
-Manages user registration, authentication, and profile operations.
-
-#### Endpoints
-
-**POST** `/User/register`
-
-Register a new user account.
-
-- **Request Body**: `UserInfo` object
-  ```json
-  {
-    "name": "John Doe",
-    "email": "john@example.com",
-    "password": "SecurePassword123!",
-    "cpf": "12345678900",
-    "phone": "5511999999999"
-  }
-  ```
-- **Returns**:
-  - `200 OK` - User registered successfully (returns user ID)
-  - `400 Bad Request` - Validation errors
-  - `500 Internal Server Error` - Registration failed
-- **Notes**: 
-  - Sends verification email to user
-  - Password is hashed before storage
-  - CPF is validated
-
-**POST** `/User/login`
-
-Authenticate user and receive JWT token.
-
-- **Request Body**: `LoginParam` object
-  ```json
-  {
-    "email": "john@example.com",
-    "password": "SecurePassword123!"
-  }
-  ```
-- **Returns**:
-  - `200 OK` - Returns JWT token and user info
-    ```json
-    {
-      "token": "eyJhbGciOiJIUzI1NiIs...",
-      "user": {
-        "id": 1,
-        "name": "John Doe",
-        "email": "john@example.com",
-        "roles": ["User"]
-      },
-      "expiresAt": "2024-01-16T10:00:00Z"
-    }
-    ```
-  - `401 Unauthorized` - Invalid credentials
-  - `500 Internal Server Error` - Login failed
-
-**POST** `/User/verifyEmail`
-
-Verify user email with token.
-
-- **Request Body**: `EmailVerificationParam` object
-  ```json
-  {
-    "userId": 1,
-    "token": "verification-token-from-email"
-  }
-  ```
-- **Returns**:
-  - `200 OK` - Email verified successfully
-  - `400 Bad Request` - Invalid or expired token
-  - `500 Internal Server Error` - Verification failed
-
-**POST** `/User/requestPasswordReset`
-
-Request password reset token.
-
-- **Request Body**:
-  ```json
-  {
-    "email": "john@example.com"
-  }
-  ```
-- **Returns**:
-  - `200 OK` - Reset email sent
-  - `404 Not Found` - User not found
-  - `500 Internal Server Error` - Request failed
-- **Notes**: Sends password reset email with token
-
-**POST** `/User/resetPassword`
-
-Reset password with token.
-
-- **Request Body**: `PasswordResetParam` object
-  ```json
-  {
-    "email": "john@example.com",
-    "token": "reset-token-from-email",
-    "newPassword": "NewSecurePassword123!"
-  }
-  ```
-- **Returns**:
-  - `200 OK` - Password reset successfully
-  - `400 Bad Request` - Invalid or expired token
-  - `500 Internal Server Error` - Reset failed
-
-**PUT** `/User/{id}`
-
-Update user profile.
-
-- **Parameters**:
-  - `id` (int, path): User ID
-- **Request Body**: `UserInfo` object (partial update supported)
-- **Returns**:
-  - `200 OK` - User updated successfully
-  - `401 Unauthorized` - Not authenticated
-  - `403 Forbidden` - Not authorized to update this user
-  - `404 Not Found` - User not found
-  - `500 Internal Server Error` - Update failed
-- **Authorization**: Requires JWT token
-
-**GET** `/User/{id}`
-
-Get user profile by ID.
-
-- **Parameters**:
-  - `id` (int, path): User ID
-- **Returns**:
-  - `200 OK` - Returns user profile
-  - `401 Unauthorized` - Not authenticated
-  - `404 Not Found` - User not found
-- **Authorization**: Requires JWT token
-
-**GET** `/User/email/{email}`
-
-Get user by email address.
-
-- **Parameters**:
-  - `email` (string, path): User email
-- **Returns**:
-  - `200 OK` - Returns user profile
-  - `401 Unauthorized` - Not authenticated
-  - `404 Not Found` - User not found
-- **Authorization**: Requires JWT token
-
-**POST** `/User/changePassword`
-
-Change user password.
-
-- **Request Body**: `ChangePasswordParam` object
-  ```json
-  {
-    "userId": 1,
-    "currentPassword": "OldPassword123!",
-    "newPassword": "NewSecurePassword123!"
-  }
-  ```
-- **Returns**:
-  - `200 OK` - Password changed successfully
-  - `401 Unauthorized` - Not authenticated or invalid current password
-  - `500 Internal Server Error` - Change failed
-- **Authorization**: Requires JWT token
-
-### Role Controller
-
-Manages user roles and permissions.
-
-#### Endpoints
-
-**GET** `/Role/list`
-
-Get all available roles.
-
-- **Returns**:
-  - `200 OK` - Array of role objects
-    ```json
-    [
-      {
-        "id": 1,
-        "name": "Admin",
-        "description": "Administrator role"
-      },
-      {
-        "id": 2,
-        "name": "User",
-        "description": "Standard user role"
-      }
-    ]
-    ```
-  - `401 Unauthorized` - Not authenticated
-- **Authorization**: Requires JWT token
-
-**POST** `/Role/assignRole`
-
-Assign a role to a user.
-
-- **Request Body**: `UserRoleParam` object
-  ```json
-  {
-    "userId": 1,
-    "roleId": 2
-  }
-  ```
-- **Returns**:
-  - `200 OK` - Role assigned successfully
-  - `401 Unauthorized` - Not authenticated
-  - `403 Forbidden` - Not authorized
-  - `404 Not Found` - User or role not found
-  - `500 Internal Server Error` - Assignment failed
-- **Authorization**: Requires JWT token with admin role
-
-**DELETE** `/Role/removeRole/{userId}/{roleId}`
-
-Remove a role from a user.
-
-- **Parameters**:
-  - `userId` (int, path): User ID
-  - `roleId` (int, path): Role ID
-- **Returns**:
-  - `200 OK` - Role removed successfully
-  - `401 Unauthorized` - Not authenticated
-  - `403 Forbidden` - Not authorized
-  - `404 Not Found` - User role assignment not found
-  - `500 Internal Server Error` - Removal failed
-- **Authorization**: Requires JWT token with admin role
-
-### Health Check Endpoint
-
-**GET** `/`
-
-Application health check endpoint.
-
-- **Returns**:
-  - `200 OK` - Application is healthy
-    ```json
-    {
-      "currentTime": "2024-01-15 10:30:00",
-      "statusApplication": "Healthy"
-    }
-    ```
-  - `503 Service Unavailable` - Application is unhealthy
-
----
-
-## 🔒 Security Features
-
-### Authentication
-- **JWT Tokens** - Secure, stateless authentication
-- **Token Expiration** - Configurable token lifetime
-- **Refresh Tokens** - Support for token refresh (configurable)
-
-### Password Security
-- **Strong Hashing** - PBKDF2 or BCrypt algorithms
-- **Salt** - Unique salt for each password
-- **Password Validation** - Minimum complexity requirements
-- **Password Reset** - Secure token-based flow with expiration
-
-### Email Verification
-- **Token-based Verification** - Secure email confirmation
-- **Token Expiration** - Tokens expire after configured time
-- **One-time Use** - Tokens are invalidated after use
-
-### CORS Configuration
-- **Configurable Origins** - Control allowed origins
-- **Secure Headers** - Proper CORS headers
-- **Credentials Support** - Optional credential support
-
-### Docker Security
-- **Non-root User** - Containers run as non-root user (`appuser`)
-- **Security Capabilities** - Minimal capabilities assigned
-- **Read-only Filesystem** - Where possible
-- **Secret Management** - Environment-based secrets
-
-### Database Security
-- **Parameterized Queries** - Protection against SQL injection
-- **Connection Encryption** - SSL/TLS support
-- **User Isolation** - Separate database users for different operations
-
----
-
-## 💾 Backup and Restore
-
-### Database Backup
-
-**Manual Backup:**
-```bash
-docker exec nauth-postgres pg_dump -U nauth nauth_db > backup_$(date +%Y%m%d_%H%M%S).sql
-```
-
-**Compressed Backup:**
-```bash
-docker exec nauth-postgres pg_dump -U nauth nauth_db | gzip > backup_$(date +%Y%m%d_%H%M%S).sql.gz
-```
-
-### Database Restore
-
-**Manual Restore:**
-```bash
-docker exec -i nauth-postgres psql -U nauth -d nauth_db < backup_20240115_120000.sql
-```
-
-**Restore Compressed Backup:**
-```bash
-gunzip < backup_20240115_120000.sql.gz | docker exec -i nauth-postgres psql -U nauth -d nauth_db
-```
-
-### Automated Backup
-
-For production, set up automated backups using cron (Linux/Mac):
-
-```bash
-# Add to crontab (crontab -e)
-0 2 * * * cd /path/to/nauth && docker exec nauth-postgres pg_dump -U nauth nauth_db > backup_$(date +\%Y\%m\%d_\%H\%M\%S).sql
-```
-
-Or Windows Task Scheduler:
-
-```powershell
-# Create scheduled task
-schtasks /create /tn "NAuth Backup" /tr "docker exec nauth-postgres pg_dump -U nauth nauth_db > C:\backups\nauth\backup_%date:~-4,4%%date:~-10,2%%date:~-7,2%.sql" /sc daily /st 02:00
-```
-
 ---
 
 ## 🧪 Testing
-
-The project includes comprehensive test coverage across all layers.
 
 ### Running Tests
 
@@ -670,9 +409,9 @@ The project includes comprehensive test coverage across all layers.
 dotnet test
 ```
 
-**Specific Project:**
+**Specific Test Class:**
 ```bash
-dotnet test NAuth.Test/NAuth.Test.csproj
+dotnet test NAuth.Test/NAuth.Test.csproj --filter "FullyQualifiedName~UserServiceTests"
 ```
 
 **With Coverage:**
@@ -685,15 +424,98 @@ dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 ```
 NAuth.Test/
 ├── Domain/
-│   ├── Models/          # Domain model tests
-│   ├── Services/        # Business logic tests
-│   └── LocalAuthHandlerTests.cs
+│   ├── Models/                    # Domain model tests
+│   └── Services/                  # UserService, RoleService tests
 ├── Infra/
-│   └── Repository/      # Data access tests
-└── ACL/
-    ├── UserClientTests.cs
-    ├── RoleClientTests.cs
-    └── RemoteAuthHandlerTests.cs
+│   └── Repository/                # Repository tests (EF InMemory)
+├── ACL/
+│   ├── NAuthHandlerTests.cs       # Auth handler tests
+│   ├── UserClientTests.cs         # User ACL client tests
+│   └── RoleClientTests.cs         # Role ACL client tests
+└── Tenant/
+    └── TenantTests.cs             # Tenant resolution and header tests
+```
+
+---
+
+## 📚 API Documentation
+
+### Authentication Flow
+
+```
+1. Register → 2. Verify Email → 3. Login (get JWT) → 4. Access Protected Resources
+```
+
+Multi-tenant requests must include the `X-Tenant-Id` header for non-authenticated endpoints. Authenticated endpoints resolve the tenant from the JWT `tenant_id` claim.
+
+### Key Endpoints
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/User/register` | Register new user | No |
+| POST | `/User/login` | Login and get JWT token | No |
+| POST | `/User/verifyEmail` | Verify email with token | No |
+| POST | `/User/requestPasswordReset` | Request password reset | No |
+| POST | `/User/resetPassword` | Reset password with token | No |
+| GET | `/User/{id}` | Get user profile | Yes |
+| PUT | `/User/{id}` | Update user profile | Yes |
+| POST | `/User/changePassword` | Change password | Yes |
+| GET | `/User/email/{email}` | Get user by email | Yes |
+| GET | `/Role/list` | List all roles | Yes |
+| POST | `/Role/assignRole` | Assign role to user | Admin |
+| DELETE | `/Role/removeRole/{userId}/{roleId}` | Remove role from user | Admin |
+| GET | `/` | Health check | No |
+
+Full API documentation available in `docs/USER_API_DOCUMENTATION.md` and `docs/ROLE_API_DOCUMENTATION.md`.
+
+---
+
+## 🔒 Security Features
+
+### Authentication
+- **JWT Tokens** - HMAC-SHA256 signed, per-tenant secrets
+- **Token Validation** - Issuer/audience validation, expiration checks
+- **Claims** - userId, email, roles, hash, tenant_id
+
+### Password Security
+- **BCrypt Hashing** - Strong password hashing with unique salts
+- **Password Reset** - Secure token-based flow with expiration
+
+### Multi-Tenant Isolation
+- **Database Isolation** - Each tenant has a separate PostgreSQL database
+- **JWT Isolation** - Each tenant has a unique signing secret
+- **Bucket Isolation** - Each tenant has its own S3 bucket
+- **Request Isolation** - Middleware enforces tenant context per request
+
+### Docker Security
+- **Non-root User** - Containers run as `appuser`
+- **Secret Management** - Environment-based secrets via `.env`
+- **HTTPS Support** - Certificate-based HTTPS
+
+---
+
+## 💾 Backup and Restore
+
+### Backup (per tenant)
+
+```bash
+# Backup emagine tenant
+pg_dump -h your_db_host -U your_user emagine_db > backup_emagine_$(date +%Y%m%d_%H%M%S).sql
+
+# Backup viralt tenant
+pg_dump -h your_db_host -U your_user viralt_db > backup_viralt_$(date +%Y%m%d_%H%M%S).sql
+
+# Backup devblog tenant
+pg_dump -h your_db_host -U your_user devblog_db > backup_devblog_$(date +%Y%m%d_%H%M%S).sql
+
+# Compressed backup
+pg_dump -h your_db_host -U your_user emagine_db | gzip > backup_emagine_$(date +%Y%m%d_%H%M%S).sql.gz
+```
+
+### Restore
+
+```bash
+psql -h your_db_host -U your_user -d emagine_db < backup_emagine_20260310_120000.sql
 ```
 
 ---
@@ -706,295 +528,99 @@ NAuth.Test/
 
 **Check logs:**
 ```bash
-docker-compose logs nauth-api
+docker compose -f docker-compose-prod.yml logs nauth-api
 ```
 
 **Common causes:**
-- Database connection failed (check CONNECTION_STRING)
-- Port already in use (change API_HTTP_PORT in .env)
-- Missing environment variables (check .env file)
+- Missing `JwtSecret` for a tenant (check env vars)
+- Database connection string incorrect
+- Port already in use
 
-#### Database Connection Failed
+#### Multi-Tenant Errors
 
-**Verify PostgreSQL is running:**
-```bash
-docker-compose ps postgres
-```
+**"JwtSecret not found for tenant":**
+- Ensure `Tenants__{tenantId}__JwtSecret` is set in docker-compose environment
+- Verify tenant ID matches exactly (case-sensitive)
 
-**Check PostgreSQL logs:**
-```bash
-docker-compose logs postgres
-```
+**"ConnectionString not found for tenant":**
+- Ensure `Tenants__{tenantId}__ConnectionString` is set
+- Verify the external database is accessible
 
-**Test connection:**
-```bash
-docker exec nauth-postgres pg_isready -U nauth -d nauth_db
-```
-
-**Common solutions:**
-- Wait for PostgreSQL to fully start (check health status)
-- Verify CONNECTION_STRING uses correct host (`nauth-postgres` for Docker)
-- Check POSTGRES_PASSWORD matches in .env and CONNECTION_STRING
+**"BucketName not found for tenant":**
+- Ensure `BucketName` is configured in `appsettings.Production.json`
 
 #### Health Check Failing
 
-**Test health endpoint:**
 ```bash
-curl http://localhost:5000/
+curl http://localhost:5004/
 ```
 
-**Check application logs:**
-```bash
-docker-compose logs nauth-api
-```
-
-#### Ports Already in Use
-
-**Find process using port:**
-```bash
-# Linux/Mac
-lsof -i :5000
-
-# Windows
-netstat -ano | findstr :5000
-```
-
-**Solution:**
-- Kill the process using the port
-- Or change port in .env file:
-  ```bash
-  API_HTTP_PORT=6000
-  API_HTTPS_PORT=6001
-  ```
-
-#### HTTPS Certificate Issues
-
-**Symptoms:**
-- HTTPS not working
-- Certificate errors in logs
-
-**Solutions:**
-1. Verify `NAuth.API/emagine.pfx` exists
-2. Check CERTIFICATE_PASSWORD in .env
-3. For development, use HTTP only (port 5000)
-
-#### Docker Build Fails
-
-**Clear Docker cache:**
-```bash
-docker-compose build --no-cache
-```
-
-**Check disk space:**
-```bash
-docker system df
-```
-
-**Clean up Docker:**
-```bash
-docker system prune -af
-```
-
-### Getting Help
-
-1. **Check logs**: `docker-compose logs -f`
-2. **Check container status**: `docker-compose ps`
-3. **Open an issue**: [GitHub Issues](https://github.com/emaginebr/NAuth/issues)
-
----
-
-## 📦 Integration
-
-### Using NAuth in Your Application
-
-#### Option 1: API Integration
-
-Connect to NAuth API from any application:
-
-```javascript
-// Example: Login request
-const response = await fetch('http://localhost:5000/User/login', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    email: 'user@example.com',
-    password: 'password123'
-  })
-});
-
-const data = await response.json();
-const token = data.token;
-
-// Use token in subsequent requests
-const userResponse = await fetch('http://localhost:5000/User/1', {
-  headers: { 'Authorization': `Bearer ${token}` }
-});
-```
-
-#### Option 2: Frontend Components
-
-Reuse NAuth React components:
-
-```jsx
-import { UserProvider, useUser } from 'nauth-core';
-
-function App() {
-  return (
-    <UserProvider apiUrl="http://localhost:5000">
-      <YourApp />
-    </UserProvider>
-  );
-}
-
-function LoginPage() {
-  const { loginWithEmail, user, loading } = useUser();
-  
-  const handleLogin = async (email, password) => {
-    const result = await loginWithEmail(email, password);
-    if (result.sucesso) {
-      // Login successful
-    }
-  };
-  
-  return (
-    // Your login form
-  );
-}
-```
-
-#### Option 3: Module Integration
-
-Import NAuth services directly (coming soon via NuGet):
-
-```csharp
-// Add NAuth to your project
-services.AddNAuth(Configuration);
-
-// Use in your controllers
-public class MyController : Controller
-{
-    private readonly IUserService _userService;
-    
-    public MyController(IUserService userService)
-    {
-        _userService = userService;
-    }
-}
-```
+**Common solutions:**
+- Wait for the API to fully start (check `start_period` in healthcheck)
+- Check API logs for startup errors
 
 ---
 
 ## 🚀 Deployment
 
-### Development Environment
-
-Using Docker Compose:
-```bash
-docker-compose up -d --build
-```
-
-Or manually without Docker:
-```bash
-dotnet run --project NAuth.API
-```
-
-### Staging Environment
+### Development
 
 ```bash
-# Use staging configuration
-docker-compose -f docker-compose.yml -f docker-compose.override.yml up -d --build
+docker compose -f docker-compose-dev.yml up -d --build
 ```
 
-### Production Environment
+### Production
 
 ```bash
-# Use production configuration
-docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+docker compose --env-file .env.prod -f docker-compose-prod.yml up -d --build
 ```
 
-### Cloud Deployment
+### CI/CD Deployment (GitHub Actions)
 
-#### Azure Container Instances
+The project includes a `deploy-prod.yml` workflow that deploys to a production server via SSH:
 
-1. Build and push image:
-   ```bash
-   docker build -t your-registry.azurecr.io/nauth-api:latest .
-   docker push your-registry.azurecr.io/nauth-api:latest
-   ```
+1. **Trigger**: Manual (`workflow_dispatch`)
+2. **Process**:
+   - Connects to the server via SSH
+   - Clones/updates the repository at `/opt/nauth`
+   - Injects `.env.prod` from GitHub Secrets
+   - Runs `docker compose --env-file .env.prod -f docker-compose-prod.yml up --build -d`
 
-2. Deploy to Azure:
-   ```bash
-   az container create --resource-group myResourceGroup \
-     --name nauth-api \
-     --image your-registry.azurecr.io/nauth-api:latest \
-     --dns-name-label nauth-api \
-     --ports 80 443
-   ```
+**Required GitHub Secrets:**
 
-#### AWS ECS
-
-1. Create task definition with NAuth and PostgreSQL containers
-2. Create ECS service
-3. Configure Application Load Balancer
-4. Set up RDS for PostgreSQL
-
-#### Kubernetes
-
-```yaml
-# Example deployment
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nauth-api
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: nauth-api
-  template:
-    metadata:
-      labels:
-        app: nauth-api
-    spec:
-      containers:
-      - name: nauth-api
-        image: your-registry/nauth-api:latest
-        ports:
-        - containerPort: 80
-        env:
-        - name: ConnectionStrings__NAuthContext
-          valueFrom:
-            secretKeyRef:
-              name: nauth-secrets
-              key: connection-string
-```
+| Secret | Description |
+|--------|-------------|
+| `PROD_SSH_HOST` | Server IP/hostname |
+| `PROD_SSH_USER` | SSH username |
+| `PROD_SSH_KEY` | SSH private key |
+| `PROD_SSH_PORT` | SSH port (default 22) |
+| `PROD_CERTIFICATE_PASSWORD` | HTTPS certificate password |
+| `PROD_EMAGINE_CONNECTION_STRING` | Emagine tenant connection string |
+| `PROD_EMAGINE_JWT_SECRET` | Emagine tenant JWT secret |
+| `PROD_VIRALT_CONNECTION_STRING` | Viralt tenant connection string |
+| `PROD_VIRALT_JWT_SECRET` | Viralt tenant JWT secret |
+| `PROD_DEVBLOG_CONNECTION_STRING` | DevBlog tenant connection string |
+| `PROD_DEVBLOG_JWT_SECRET` | DevBlog tenant JWT secret |
 
 ---
 
 ## 🔄 CI/CD
 
-### GitHub Actions
+### GitHub Actions Workflows
 
-The project includes a GitHub Actions workflow for automated Docker builds.
+| Workflow | Trigger | Description |
+|----------|---------|-------------|
+| **Version and Tag** | Push to main | GitVersion semantic versioning and tagging |
+| **Publish NuGet** | After Version and Tag | Publishes NAuth package to NuGet.org |
+| **Create Release** | After Version and Tag | Creates GitHub release with notes |
+| **Deploy Production** | Manual | SSH deploy to production server |
 
-**Workflow triggers:**
-- Push to `main` or `develop` branches
-- Pull requests to `main`
-- Tags matching `v*` pattern
+### Versioning
 
-**Workflow steps:**
-1. Build Docker images for API and PostgreSQL
-2. Push images to GitHub Container Registry (ghcr.io)
-3. Create image tags based on:
-   - Branch name
-   - Semver version
-   - Commit SHA
-
-**Using the images:**
-```bash
-docker pull ghcr.io/emaginebr/nauth/nauth-api:main
-docker pull ghcr.io/emaginebr/nauth/nauth-postgres:main
-```
+Commit message prefixes control version bumps:
+- `major:` or `breaking:` → Major version bump
+- `feat:` or `feature:` or `minor:` → Minor version bump
+- `fix:` or `patch:` → Patch version bump
 
 ---
 
@@ -1003,11 +629,7 @@ docker pull ghcr.io/emaginebr/nauth/nauth-postgres:main
 ### Planned Features
 
 - [ ] **Two-Factor Authentication (2FA)** - TOTP and SMS support
-- [ ] **OAuth2 Integration** - Social login providers
-  - [ ] Google
-  - [ ] GitHub
-  - [ ] Facebook
-  - [ ] Microsoft
+- [ ] **OAuth2 Integration** - Social login providers (Google, GitHub, Facebook, Microsoft)
 - [ ] **Admin Dashboard** - Web interface for user management
 - [ ] **Advanced RBAC** - Fine-grained permissions
 - [ ] **Audit Logging** - Track user actions
@@ -1015,8 +637,6 @@ docker pull ghcr.io/emaginebr/nauth/nauth-postgres:main
 - [ ] **Session Management** - Multiple device support
 - [ ] **Account Lockout** - Brute force protection
 - [ ] **Password Policies** - Configurable complexity rules
-- [ ] **User Invitations** - Admin-initiated registration
-- [ ] **NuGet Package** - Easy integration via NuGet
 - [ ] **Localization** - Multi-language support
 
 ---
@@ -1031,7 +651,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
 3. Make your changes
 4. Run tests (`dotnet test`)
-5. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+5. Commit your changes (`git commit -m 'feat: Add some AmazingFeature'`)
 6. Push to the branch (`git push origin feature/AmazingFeature`)
 7. Open a Pull Request
 
@@ -1040,13 +660,13 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - Follow C# coding conventions
 - Write unit tests for new features
 - Update documentation as needed
-- Keep commits atomic and well-described
+- Use commit message prefixes for versioning (`feat:`, `fix:`, `major:`)
 
 ---
 
 ## 👨‍💻 Author
 
-Developed by **[Rodrigo Landim Carneiro](https://github.com/emaginebr)**
+Developed by **[Rodrigo Landim Carneiro](https://github.com/landim32)**
 
 ---
 
@@ -1062,14 +682,13 @@ This project is licensed under the **MIT License** - see the LICENSE file for de
 - Database powered by [PostgreSQL](https://www.postgresql.org/)
 - Frontend with [React](https://reactjs.org/)
 - Containerization with [Docker](https://www.docker.com/)
-- Documentation inspired by best practices in open source
 
 ---
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/emaginebr/NAuth/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/emaginebr/NAuth/discussions)
+- **Issues**: [GitHub Issues](https://github.com/landim32/NAuth.API/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/landim32/NAuth.API/discussions)
 
 ---
 

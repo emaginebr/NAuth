@@ -45,7 +45,6 @@ namespace NAuth.Domain.Services
     public class UserService : IUserService
     {
         private readonly ILogger<UserService> _logger;
-        private readonly NAuthSetting _nauthSetting;
         private readonly DomainFactory _factories;
         private readonly ExternalClients _clients;
         private readonly IUnitOfWork _unitOfWork;
@@ -56,7 +55,6 @@ namespace NAuth.Domain.Services
 
         public UserService(
             ILogger<UserService> logger,
-            IOptions<NAuthSetting> nauthSetting,
             DomainFactory factories,
             ExternalClients clients,
             IUnitOfWork unitOfWork,
@@ -64,7 +62,6 @@ namespace NAuth.Domain.Services
             Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
             _logger = logger;
-            _nauthSetting = nauthSetting.Value;
             _factories = factories;
             _clients = clients;
             _unitOfWork = unitOfWork;
@@ -74,7 +71,8 @@ namespace NAuth.Domain.Services
 
         public string GetBucketName()
         {
-            return _nauthSetting.BucketName;
+            var tenantId = ResolveTenantIdFromRequest();
+            return ResolveBucketNameForTenant(tenantId);
         }
 
         public IUserModel LoginWithEmail(string email, string password)
@@ -202,6 +200,16 @@ namespace NAuth.Domain.Services
 
             throw new InvalidOperationException(
                 $"JwtSecret not found for tenant '{tenantId}'. Expected key: Tenants:{tenantId}:JwtSecret");
+        }
+
+        private string ResolveBucketNameForTenant(string tenantId)
+        {
+            var tenantBucket = _configuration?[$"Tenants:{tenantId}:BucketName"];
+            if (!string.IsNullOrWhiteSpace(tenantBucket))
+                return tenantBucket;
+
+            throw new InvalidOperationException(
+                $"BucketName not found for tenant '{tenantId}'. Expected key: Tenants:{tenantId}:BucketName");
         }
 
         public bool HasPassword(long userId)

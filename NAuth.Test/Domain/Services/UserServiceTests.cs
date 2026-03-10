@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 using NAuth.Domain.Exceptions;
 using NAuth.Domain.Factory;
 using NAuth.Domain.Factory.Interfaces;
 using NAuth.Domain.Models.Models;
 using NAuth.Domain.Services;
-using NAuth.DTO.Settings;
 using NAuth.Infra.Interfaces;
 using zTools.ACL.Interfaces;
 using zTools.DTO.MailerSend;
@@ -19,7 +18,6 @@ namespace NAuth.Test.Domain.Services
     public class UserServiceTests
     {
         private readonly Mock<ILogger<UserService>> _mockLogger;
-        private readonly Mock<IOptions<NAuthSetting>> _mockOptions;
         private readonly Mock<IUserDomainFactory> _mockUserFactory;
         private readonly Mock<IUserPhoneDomainFactory> _mockPhoneFactory;
         private readonly Mock<IUserAddressDomainFactory> _mockAddressFactory;
@@ -31,12 +29,11 @@ namespace NAuth.Test.Domain.Services
         private readonly Mock<IUnitOfWork> _mockUnitOfWork;
         private readonly Mock<IUserModel> _mockUserModel;
         private readonly UserService _userService;
-        private readonly NAuthSetting _nauthSetting;
+        private readonly IConfiguration _configuration;
 
         public UserServiceTests()
         {
             _mockLogger = new Mock<ILogger<UserService>>();
-            _mockOptions = new Mock<IOptions<NAuthSetting>>();
             _mockUserFactory = new Mock<IUserDomainFactory>();
             _mockPhoneFactory = new Mock<IUserPhoneDomainFactory>();
             _mockAddressFactory = new Mock<IUserAddressDomainFactory>();
@@ -48,13 +45,15 @@ namespace NAuth.Test.Domain.Services
             _mockUnitOfWork = new Mock<IUnitOfWork>();
             _mockUserModel = new Mock<IUserModel>();
 
-            _nauthSetting = new NAuthSetting
-            {
-                JwtSecret = "test-secret-key-that-is-long-enough-for-hmac-sha256",
-                BucketName = "test-bucket"
-            };
-
-            _mockOptions.Setup(o => o.Value).Returns(_nauthSetting);
+            _configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "Tenant:DefaultTenantId", "test-tenant" },
+                    { "Tenants:test-tenant:JwtSecret", "test-secret-key-that-is-long-enough-for-hmac-sha256" },
+                    { "Tenants:test-tenant:BucketName", "test-bucket" },
+                    { "Tenants:test-tenant:ConnectionString", "Host=localhost;Database=test" }
+                })
+                .Build();
 
             var factories = new DomainFactory(
                 _mockUserFactory.Object,
@@ -72,12 +71,11 @@ namespace NAuth.Test.Domain.Services
 
             _userService = new UserService(
                 _mockLogger.Object,
-                _mockOptions.Object,
                 factories,
                 clients,
                 _mockUnitOfWork.Object,
-                new Mock<Microsoft.AspNetCore.Http.IHttpContextAccessor>().Object,
-                new Mock<Microsoft.Extensions.Configuration.IConfiguration>().Object
+                new Mock<IHttpContextAccessor>().Object,
+                _configuration
             );
         }
 
