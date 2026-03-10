@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
     <PackageReference Include="Moq" Version="4.20.72" />
@@ -26,8 +27,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NAuth.API\NAuth.API.csproj" />
     <ProjectReference Include="..\NAuth.Domain\NAuth.Domain.csproj" />
     <ProjectReference Include="..\NAuth.Infra\NAuth.Infra.csproj" />
+    <ProjectReference Include="..\NAuth.Infra.Interfaces\NAuth.Infra.Interfaces.csproj" />
     <ProjectReference Include="..\NAuth\NAuth.csproj" />
   </ItemGroup>
 

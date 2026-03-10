@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NAuth.ACL;
 using NAuth.Domain.Factory;
@@ -27,15 +27,13 @@ namespace NAuth.Application
             else
                 services.AddTransient(serviceType, implementationType);
         }
-        public static void Configure(IServiceCollection services, string connection, bool scoped = true)
-        {
-            if (scoped)
-                services.AddDbContext<NAuthContext>(x => x.UseLazyLoadingProxies().UseNpgsql(connection));
-            else
-                services.AddDbContextFactory<NAuthContext>(x => x.UseLazyLoadingProxies().UseNpgsql(connection));
 
+        /// <summary>
+        /// Multi-tenant configuration: NAuthContext is resolved via ITenantDbContextFactory (registered in Startup).
+        /// </summary>
+        public static void Configure(IServiceCollection services, IConfiguration configuration, bool scoped = true)
+        {
             #region Infra
-            injectDependency(typeof(NAuthContext), typeof(NAuthContext), services, scoped);
             injectDependency(typeof(IUnitOfWork), typeof(UnitOfWork), services, scoped);
             #endregion
 

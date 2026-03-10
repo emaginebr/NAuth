@@ -36,13 +36,6 @@ namespace NAuth.ACL
                 return Task.FromResult(AuthenticateResult.Fail("Missing Authorization Header"));
             }
 
-            string jwtSecret = _nauthSetting.JwtSecret;
-            if (string.IsNullOrEmpty(jwtSecret))
-            {
-                Logger.LogError("Authentication failed: JWT Secret is not configured");
-                return Task.FromResult(AuthenticateResult.Fail("Missing JWT Secret"));
-            }
-
             try
             {
                 var authHeaderValue = Request.Headers["Authorization"].ToString();
@@ -55,7 +48,13 @@ namespace NAuth.ACL
                 var authHeader = AuthenticationHeaderValue.Parse(authHeaderValue);
                 var token = authHeader.Parameter;
 
-                Logger.LogTrace("Autentication Token={Token}, JWT Secret={JwtSecret}", token, jwtSecret);
+                var jwtSecret = _nauthSetting.JwtSecret;
+                if (string.IsNullOrEmpty(jwtSecret))
+                {
+                    Logger.LogError("Authentication failed: NAuth:JwtSecret is not configured");
+                    return Task.FromResult(AuthenticateResult.Fail("Missing JWT Secret"));
+                }
+
                 Logger.LogDebug("Starting JWT token validation");
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.ASCII.GetBytes(jwtSecret);

@@ -73,7 +73,9 @@ namespace NAuth.Test.Domain.Services
                 _mockOptions.Object,
                 factories,
                 clients,
-                _mockUnitOfWork.Object
+                _mockUnitOfWork.Object,
+                new Mock<Microsoft.AspNetCore.Http.IHttpContextAccessor>().Object,
+                new Mock<Microsoft.Extensions.Configuration.IConfiguration>().Object
             );
 
             _mockUnitOfWork.Setup(u => u.BeginTransaction()).Returns(_mockTransaction.Object);

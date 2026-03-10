@@ -1,0 +1,74 @@
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: postgres-prod.Dockerfile
+    container_name: nauth-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+      NAUTH_DB: ${NAUTH_DB}
+      VIRALT_DB: ${VIRALT_DB}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - emagine-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nauth-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nauth-api
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+      ASPNETCORE_URLS: "http://+:80;https://+:443"
+      # Global NAuth settings
+      NAuth__JwtSecret: ${JWT_SECRET}
+      NAuth__BucketName: ${BUCKET_NAME:-Emagine}
+      # Default tenant
+      Tenant__DefaultTenantId: ${DEFAULT_TENANT_ID:-nauth}
+      # Tenant: nauth
+      Tenants__nauth__ConnectionString: Host=nauth-postgres;Port=5432;Database=${NAUTH_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      Tenants__nauth__JwtSecret: ${NAUTH_JWT_SECRET}
+      # Tenant: viralt
+      Tenants__viralt__ConnectionString: Host=nauth-postgres;Port=5432;Database=${VIRALT_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      Tenants__viralt__JwtSecret: ${VIRALT_JWT_SECRET}
+      # External services
+      zTools__ApiURL: ${ZTOOL_API_URL:-http://ztools-api:8080}
+      # HTTPS certificate
+      ASPNETCORE_Kestrel__Certificates__Default__Password: ${CERTIFICATE_PASSWORD}
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /app/emagine.pfx
+    ports:
+      - "${API_HTTP_PORT:-5004}:80"
+      - "${API_HTTPS_PORT:-5005}:443"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - emagine-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/ || exit 1"]
+      interval: 30s
+      timeout: 3s
+      start_period: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  emagine-network:
+    name: emagine-network
+    external: true

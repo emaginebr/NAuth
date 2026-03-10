@@ -49,6 +49,8 @@ namespace NAuth.Domain.Services
         private readonly DomainFactory _factories;
         private readonly ExternalClients _clients;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
 
         private const string UserNotFoundMessage = "User not found";
 
@@ -57,13 +59,17 @@ namespace NAuth.Domain.Services
             IOptions<NAuthSetting> nauthSetting,
             DomainFactory factories,
             ExternalClients clients,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IHttpContextAccessor httpContextAccessor,
+            Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
             _logger = logger;
             _nauthSetting = nauthSetting.Value;
             _factories = factories;
             _clients = clients;
             _unitOfWork = unitOfWork;
+            _httpContextAccessor = httpContextAccessor;
+            _configuration = configuration;
         }
 
         public string GetBucketName()
@@ -90,8 +96,12 @@ namespace NAuth.Domain.Services
                 throw new UserValidationException(UserNotFoundMessage);
             }
 
+            // Resolve tenant-specific JwtSecret
+            var tenantId = ResolveTenantIdFromRequest();
+            var jwtSecret = ResolveJwtSecretForTenant(tenantId);
+
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_nauthSetting.JwtSecret);
+            var key = Encoding.ASCII.GetBytes(jwtSecret);
 
             var claims = new List<Claim>
             {
@@ -103,7 +113,8 @@ namespace NAuth.Domain.Services
                 new Claim("ipAddress", ipAddress),
                 new Claim("userAgent", userAgent),
                 new Claim("fingerprint", fingerprint),
-                new Claim("isAdmin", user.IsAdmin.ToString())
+                new Claim("isAdmin", user.IsAdmin.ToString()),
+                new Claim("tenant_id", tenantId)
             };
 
             // Adicionar roles como claims
@@ -152,6 +163,45 @@ namespace NAuth.Domain.Services
             {
                 throw new UserValidationException("Fingerprint is empty");
             }
+        }
+
+        private string ResolveTenantIdFromRequest()
+        {
+            var httpContext = _httpContextAccessor?.HttpContext;
+            if (httpContext != null)
+            {
+                // Try X-Tenant-Id header first
+                if (httpContext.Request.Headers.TryGetValue("X-Tenant-Id", out var headerValue)
+                    && !string.IsNullOrWhiteSpace(headerValue.ToString()))
+                {
+                    return headerValue.ToString();
+                }
+
+                // Try HttpContext.Items (set by TenantMiddleware)
+                if (httpContext.Items.TryGetValue("TenantId", out var itemValue)
+                    && itemValue is string tid
+                    && !string.IsNullOrWhiteSpace(tid))
+                {
+                    return tid;
+                }
+            }
+
+            // Fallback to default tenant from config
+            var defaultTenant = _configuration?["Tenant:DefaultTenantId"];
+            if (!string.IsNullOrWhiteSpace(defaultTenant))
+                return defaultTenant;
+
+            return "default-tenant";
+        }
+
+        private string ResolveJwtSecretForTenant(string tenantId)
+        {
+            var tenantSecret = _configuration?[$"Tenants:{tenantId}:JwtSecret"];
+            if (!string.IsNullOrWhiteSpace(tenantSecret))
+                return tenantSecret;
+
+            throw new InvalidOperationException(
+                $"JwtSecret not found for tenant '{tenantId}'. Expected key: Tenants:{tenantId}:JwtSecret");
         }
 
         public bool HasPassword(long userId)

@@ -25,7 +25,9 @@
       "Bash(dotnet new:*)",
       "Bash(dotnet run:*)",
       "Bash(dotnet test:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(dotnet list:*)",
+      "Bash(git mv:*)"
     ]
   }
 }
