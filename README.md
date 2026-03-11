@@ -336,19 +336,21 @@ docker compose -f docker-compose-prod.yml ps
 # View logs
 docker compose -f docker-compose-prod.yml logs -f
 
-# Test health check
-curl http://localhost:5004/
+# Test health check (from inside the Docker network)
+docker exec nauth-api curl -f http://localhost:80/
 ```
 
 ### Accessing the Application
 
-| Service | URL |
-|---------|-----|
-| **API HTTP** | http://localhost:5004 |
-| **API HTTPS** | https://localhost:5005 |
-| **Swagger UI** | http://localhost:5004/swagger |
-| **Health Check** | http://localhost:5004/ |
-| **PostgreSQL** (dev only) | localhost:5432 |
+| Service | URL | Notes |
+|---------|-----|-------|
+| **API HTTP** | http://localhost:5004 | Dev only (ports exposed) |
+| **API HTTPS** | https://localhost:5005 | Dev only (ports exposed) |
+| **Swagger UI** | http://localhost:5004/swagger | Dev only |
+| **Health Check** | http://localhost/ | Internal (via Docker network) |
+| **PostgreSQL** | localhost:5432 | Dev only |
+
+> **Production**: Ports are **not exposed** to the host. The API is accessible only through the `emagine-network` Docker network (ports 80/443 internal). Use a reverse proxy (e.g., Nginx) in a separate project to expose the API externally.
 
 ### Docker Compose Commands
 

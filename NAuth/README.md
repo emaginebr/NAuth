@@ -4,9 +4,9 @@
 [![NuGet Downloads](https://img.shields.io/nuget/dt/NAuth.svg)](https://www.nuget.org/packages/NAuth/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Unified library for the [NAuth](https://github.com/landim32/NAuth.API) authentication and authorization ecosystem. Contains Data Transfer Objects (DTOs), HTTP client implementations (ACL), authentication handlers, JWT token processing, and **multi-tenant support** for user management, roles, and authentication.
+Unified library for the [NAuth](https://github.com/emaginebr/NAuth) authentication and authorization ecosystem. Contains Data Transfer Objects (DTOs), HTTP client implementations (ACL), authentication handlers, JWT token processing, and **multi-tenant support** for user management, roles, and authentication.
 
-> **Part of the NAuth ecosystem** — see [NAuth.API](https://github.com/landim32/NAuth.API) for the main project and full documentation.
+> **Part of the NAuth ecosystem** — see [NAuth.API](https://github.com/emaginebr/NAuth) for the main project and full documentation.
 
 ## Installation
 
@@ -604,12 +604,19 @@ catch (Exception ex)
 
 ## NAuth Ecosystem
 
-| Project | Description |
-|---------|-------------|
-| **[NAuth.API](https://github.com/landim32/NAuth.API)** | Central REST API backend (main project) |
-| **NAuth** | Unified DTOs + ACL client library (NuGet) |
-| **[NAuth.React](https://github.com/landim32/NAuth.React)** | React component library (NPM) |
-| **[NAuth.App](https://github.com/landim32/NAuth.APP)** | Frontend web application |
+| Project | Type | Package | Description |
+|---------|------|---------|-------------|
+| **[NAuth.API](https://github.com/emaginebr/NAuth)** | .NET | — | Central REST API backend (main project) |
+| **NAuth** | .NET | [![NuGet](https://img.shields.io/nuget/v/NAuth.svg)](https://www.nuget.org/packages/NAuth/) | Unified DTOs + ACL client library (this package) |
+| **[nauth-react](https://github.com/emaginebr/nauth-react)** | NPM | [![npm](https://img.shields.io/npm/v/nauth-react.svg)](https://www.npmjs.com/package/nauth-react) | React component library (login, register, user management) |
+
+### Dependency graph
+
+```
+nauth-react (NPM)
+  └─ NAuth.API (HTTP)
+       └─ NAuth (NuGet - DTOs + ACL)
+```
 
 ## Contributing
 
@@ -622,12 +629,12 @@ This project is licensed under the MIT License - see the [LICENSE](https://opens
 ## Links
 
 - [NuGet Package](https://www.nuget.org/packages/NAuth/)
-- [GitHub Repository](https://github.com/landim32/NAuth.API)
+- [GitHub Repository](https://github.com/emaginebr/NAuth)
 
 ## Support
 
-For issues, questions, or contributions, please visit the [GitHub repository](https://github.com/landim32/NAuth.API).
+For issues, questions, or contributions, please visit the [GitHub repository](https://github.com/emaginebr/NAuth).
 
 ---
 
-Made with love by [Rodrigo Landim](https://github.com/landim32) at Emagine
+Made with love by [Rodrigo Landim Carneiro](https://github.com/landim32) at Emagine
