@@ -44,6 +44,8 @@ jobs:
           VIRALT_JWT_SECRET=${{ secrets.VIRALT_JWT_SECRET }}
           DEVBLOG_CONNECTION_STRING=${{ secrets.DEVBLOG_CONNECTION_STRING }}
           DEVBLOG_JWT_SECRET=${{ secrets.DEVBLOG_JWT_SECRET }}
+          BAZZUCA_CONNECTION_STRING=${{ secrets.BAZZUCA_CONNECTION_STRING }}
+          BAZZUCA_JWT_SECRET=${{ secrets.BAZZUCA_JWT_SECRET }}
           ENVEOF
 
           # Remove leading whitespace from .env.prod

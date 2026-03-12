@@ -168,6 +168,11 @@ Tenants are configured in `appsettings.json` (or injected via environment variab
       "ConnectionString": "Host=localhost;Port=5432;Database=devblog_db;Username=...",
       "JwtSecret": "your_devblog_jwt_secret_at_least_64_characters_long",
       "BucketName": "DevBlog"
+    },
+    "bazzuca": {
+      "ConnectionString": "Host=localhost;Port=5432;Database=bazzuca_db;Username=...",
+      "JwtSecret": "your_bazzuca_jwt_secret_at_least_64_characters_long",
+      "BucketName": "Bazzuca"
     }
   }
 }
@@ -180,6 +185,7 @@ Tenants are configured in `appsettings.json` (or injected via environment variab
 | `emagine` | Emagine | Default tenant |
 | `viralt` | Viralt | Viralt platform |
 | `devblog` | DevBlog | DevBlog platform |
+| `bazzuca` | Bazzuca | Bazzuca platform |
 
 ### Key Components
 
@@ -209,7 +215,7 @@ The following diagram illustrates the high-level architecture of **NAuth.API**, 
 - **Controllers** delegate to domain services (`UserService`, `RoleService`), which contain all business logic.
 - **NAuth.Infra** provides data access via EF Core 9 repositories and `UnitOfWork`, with `TenantDbContextFactory` routing each request to the correct tenant database.
 - **External Services**: MailerSend (transactional emails), Amazon S3 (per-tenant file storage), Stripe (payments), and zTools API (image processing).
-- **PostgreSQL**: Each tenant has its own isolated database (`emagine_db`, `viralt_db`, `devblog_db`).
+- **PostgreSQL**: Each tenant has its own isolated database (`emagine_db`, `viralt_db`, `devblog_db`, `bazzuca_db`).
 
 > 📄 **Source:** The editable Mermaid source is available at [`docs/system-design.mmd`](docs/system-design.mmd).
 
@@ -275,6 +281,10 @@ VIRALT_JWT_SECRET=your_viralt_jwt_secret_at_least_64_characters_long
 # Tenant: devblog
 DEVBLOG_CONNECTION_STRING=Host=your_db_host;Port=5432;Database=devblog_db;Username=your_user;Password=your_password
 DEVBLOG_JWT_SECRET=your_devblog_jwt_secret_at_least_64_characters_long
+
+# Tenant: bazzuca
+BAZZUCA_CONNECTION_STRING=Host=your_db_host;Port=5432;Database=bazzuca_db;Username=your_user;Password=your_password
+BAZZUCA_JWT_SECRET=your_bazzuca_jwt_secret_at_least_64_characters_long
 ```
 
 ⚠️ **IMPORTANT**:
@@ -292,7 +302,7 @@ The project provides two Docker Compose configurations:
 | File | Purpose | Database | Tenants |
 |------|---------|----------|---------|
 | `docker-compose-dev.yml` | Development | Included (PostgreSQL container) | Single tenant |
-| `docker-compose-prod.yml` | Production | External (connection strings in `.env.prod`) | Multi-tenant (emagine + viralt + devblog) |
+| `docker-compose-prod.yml` | Production | External (connection strings in `.env.prod`) | Multi-tenant (emagine + viralt + devblog + bazzuca) |
 
 ### Prerequisites
 
@@ -325,6 +335,8 @@ Tenants__viralt__ConnectionString: ${VIRALT_CONNECTION_STRING}
 Tenants__viralt__JwtSecret: ${VIRALT_JWT_SECRET}
 Tenants__devblog__ConnectionString: ${DEVBLOG_CONNECTION_STRING}
 Tenants__devblog__JwtSecret: ${DEVBLOG_JWT_SECRET}
+Tenants__bazzuca__ConnectionString: ${BAZZUCA_CONNECTION_STRING}
+Tenants__bazzuca__JwtSecret: ${BAZZUCA_JWT_SECRET}
 ```
 
 ### Verify Deployment
@@ -388,6 +400,9 @@ psql -U postgres -d viralt_db -f nauth.sql
 
 psql -U postgres -c "CREATE DATABASE devblog_db;"
 psql -U postgres -d devblog_db -f nauth.sql
+
+psql -U postgres -c "CREATE DATABASE bazzuca_db;"
+psql -U postgres -d bazzuca_db -f nauth.sql
 ```
 
 #### 2. Configure appsettings
@@ -414,6 +429,11 @@ Update `NAuth.API/appsettings.Development.json` with your tenant configuration:
       "ConnectionString": "Host=localhost;Port=5432;Database=devblog_db;Username=postgres;Password=your_password",
       "JwtSecret": "your_devblog_jwt_secret_at_least_64_characters",
       "BucketName": "DevBlog"
+    },
+    "bazzuca": {
+      "ConnectionString": "Host=localhost;Port=5432;Database=bazzuca_db;Username=postgres;Password=your_password",
+      "JwtSecret": "your_bazzuca_jwt_secret_at_least_64_characters",
+      "BucketName": "Bazzuca"
     }
   }
 }
@@ -541,6 +561,9 @@ pg_dump -h your_db_host -U your_user viralt_db > backup_viralt_$(date +%Y%m%d_%H
 # Backup devblog tenant
 pg_dump -h your_db_host -U your_user devblog_db > backup_devblog_$(date +%Y%m%d_%H%M%S).sql
 
+# Backup bazzuca tenant
+pg_dump -h your_db_host -U your_user bazzuca_db > backup_bazzuca_$(date +%Y%m%d_%H%M%S).sql
+
 # Compressed backup
 pg_dump -h your_db_host -U your_user emagine_db | gzip > backup_emagine_$(date +%Y%m%d_%H%M%S).sql.gz
 ```
@@ -634,6 +657,8 @@ The project includes a `deploy-prod.yml` workflow that deploys to a production s
 | `PROD_VIRALT_JWT_SECRET` | Viralt tenant JWT secret |
 | `PROD_DEVBLOG_CONNECTION_STRING` | DevBlog tenant connection string |
 | `PROD_DEVBLOG_JWT_SECRET` | DevBlog tenant JWT secret |
+| `PROD_BAZZUCA_CONNECTION_STRING` | Bazzuca tenant connection string |
+| `PROD_BAZZUCA_JWT_SECRET` | Bazzuca tenant JWT secret |
 
 ---
 

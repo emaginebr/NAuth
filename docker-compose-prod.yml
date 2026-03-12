@@ -21,6 +21,10 @@ services:
       Tenants__devblog__ConnectionString: ${DEVBLOG_CONNECTION_STRING}
       # Maps to appsettings: Tenants.devblog.JwtSecret
       Tenants__devblog__JwtSecret: ${DEVBLOG_JWT_SECRET}
+      # Maps to appsettings: Tenants.bazzuca.ConnectionString
+      Tenants__bazzuca__ConnectionString: ${BAZZUCA_CONNECTION_STRING}
+      # Maps to appsettings: Tenants.bazzuca.JwtSecret
+      Tenants__bazzuca__JwtSecret: ${BAZZUCA_JWT_SECRET}
       # HTTPS certificate
       ASPNETCORE_Kestrel__Certificates__Default__Password: ${CERTIFICATE_PASSWORD}
       ASPNETCORE_Kestrel__Certificates__Default__Path: /app/emagine.pfx
