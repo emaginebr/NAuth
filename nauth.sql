@@ -1,7 +1,3 @@
--- CREATE DATABASE (IF NOT EXISTS)
-SELECT 'CREATE DATABASE nauth'
-WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'nauth')\gexec
-
 -- TABLES (com IF NOT EXISTS)
 CREATE TABLE IF NOT EXISTS user_addresses (
     address_id bigint NOT NULL,

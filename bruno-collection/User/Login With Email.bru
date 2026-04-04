@@ -12,18 +12,19 @@ post {
 
 headers {
   X-Device-Fingerprint: bruno-client
-  X-Tenant-Id: monexup
+  X-Tenant-Id: emagine
+  ~X-Tenant-Id: monexup
 }
 
 body:json {
   {
-    "email": "john@example.com",
-    "password": "P@ssw0rd123"
+    "email": "rodrigo@emagine.com.br",
+    "password": "pikpro6"
   }
 }
 
 vars:pre-request {
-  baseUrl: https://emagine.com.br/auth-api	
+  baseUrl: https://emagine.com.br/auth-api
 }
 
 script:post-response {
