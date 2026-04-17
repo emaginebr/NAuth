@@ -17,7 +17,7 @@ namespace NAuth.Domain.Services.Interfaces
         Task<bool> SendRecoveryEmail(string email);
 
         Task<IUserModel> Insert(UserInsertedInfo user);
-        Task<IUserModel> Update(UserInfo user);
+        Task<IUserModel> Update(UserUpdatedInfo user);
         IUserModel GetUserByEmail(string email);
         IUserModel GetBySlug(string slug);
         IUserModel GetUserByID(long userId);

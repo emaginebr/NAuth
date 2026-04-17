@@ -384,7 +384,7 @@ namespace NAuth.Domain.Services
             }
         }
 
-        private void InsertPhones(UserInfo user)
+        private void InsertPhones(UserUpdatedInfo user)
         {
             if (user.Phones != null && user.Phones.Any())
             {
@@ -398,7 +398,7 @@ namespace NAuth.Domain.Services
             }
         }
 
-        private void InsertAddresses(UserInfo user)
+        private void InsertAddresses(UserUpdatedInfo user)
         {
             if (user.Addresses != null && user.Addresses.Any())
             {
@@ -429,7 +429,7 @@ namespace NAuth.Domain.Services
             }
         }
 
-        private void InsertRoles(UserInfo user)
+        private void InsertRoles(UserUpdatedInfo user)
         {
             if (user.Roles != null && user.Roles.Any())
             {
@@ -465,7 +465,7 @@ namespace NAuth.Domain.Services
             }
         }
 
-        private void ValidateRoles(UserInfo user)
+        private void ValidateRoles(UserUpdatedInfo user)
         {
             if (user.Roles == null)
             {
@@ -512,7 +512,7 @@ namespace NAuth.Domain.Services
             }
         }
 
-        private async Task ValidatePhones(UserInfo user)
+        private async Task ValidatePhones(UserUpdatedInfo user)
         {
             if (user.Phones == null)
             {
@@ -549,7 +549,7 @@ namespace NAuth.Domain.Services
             }
         }
 
-        private async Task ValidateAddresses(UserInfo user)
+        private async Task ValidateAddresses(UserUpdatedInfo user)
         {
             if (user.Addresses == null)
             {
@@ -686,7 +686,7 @@ namespace NAuth.Domain.Services
             ValidateRoles(user);
         }
 
-        public async Task<IUserModel> Update(UserInfo user)
+        public async Task<IUserModel> Update(UserUpdatedInfo user)
         {
             using (var transaction = _unitOfWork.BeginTransaction())
             {
@@ -770,7 +770,7 @@ namespace NAuth.Domain.Services
             }
         }
 
-        private async Task ValidateUserForUpdate(UserInfo user, IUserModel model)
+        private async Task ValidateUserForUpdate(UserUpdatedInfo user, IUserModel model)
         {
             if (string.IsNullOrEmpty(user.Email))
             {

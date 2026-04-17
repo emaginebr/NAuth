@@ -141,7 +141,7 @@ namespace NAuth.Test.Domain.Services
             // Act & Assert
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _userService.Insert(user));
-            Assert.Contains("Error inserting user", exception.Message);
+            Assert.Contains("Name is empty", exception.Message);
             _mockTransaction.Verify(t => t.Rollback(), Times.Once);
         }
 
@@ -161,7 +161,7 @@ namespace NAuth.Test.Domain.Services
             // Act & Assert
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _userService.Insert(user));
-            Assert.Contains("Error inserting user", exception.Message);
+            Assert.Contains("Email is empty", exception.Message);
             _mockTransaction.Verify(t => t.Rollback(), Times.Once);
         }
 
@@ -183,7 +183,7 @@ namespace NAuth.Test.Domain.Services
             // Act & Assert
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _userService.Insert(user));
-            Assert.Contains("Error inserting user", exception.Message);
+            Assert.Contains("Email is not valid", exception.Message);
             _mockTransaction.Verify(t => t.Rollback(), Times.Once);
         }
 
@@ -207,7 +207,7 @@ namespace NAuth.Test.Domain.Services
             // Act & Assert
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _userService.Insert(user));
-            Assert.Contains("Error inserting user", exception.Message);
+            Assert.Contains("User with email already registered", exception.Message);
             _mockTransaction.Verify(t => t.Rollback(), Times.Once);
         }
 
@@ -231,7 +231,7 @@ namespace NAuth.Test.Domain.Services
             // Act & Assert
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _userService.Insert(user));
-            Assert.Contains("Error inserting user", exception.Message);
+            Assert.Contains("Password is empty", exception.Message);
             _mockTransaction.Verify(t => t.Rollback(), Times.Once);
         }
 
@@ -260,7 +260,7 @@ namespace NAuth.Test.Domain.Services
             // Act & Assert
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _userService.Insert(user));
-            Assert.Contains("Error inserting user", exception.Message);
+            Assert.Contains("is not a valid CPF or CNPJ", exception.Message);
             _mockTransaction.Verify(t => t.Rollback(), Times.Once);
         }
 
@@ -380,7 +380,7 @@ namespace NAuth.Test.Domain.Services
             var mockPhoneModel = new Mock<IUserPhoneModel>();
             var mockAddressModel = new Mock<IUserAddressModel>();
 
-            var user = new UserInfo
+            var user = new UserUpdatedInfo
             {
                 UserId = 1L,
                 Name = "Updated User",
@@ -428,7 +428,7 @@ namespace NAuth.Test.Domain.Services
         public async Task Update_WithInvalidUserId_ShouldThrowException()
         {
             // Arrange
-            var user = new UserInfo
+            var user = new UserUpdatedInfo
             {
                 UserId = 0,
                 Name = "Test User",
@@ -440,7 +440,7 @@ namespace NAuth.Test.Domain.Services
             // Act & Assert
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _userService.Update(user));
-            Assert.Contains("Error updating user", exception.Message);
+            Assert.Contains("User not found", exception.Message);
             _mockTransaction.Verify(t => t.Rollback(), Times.Once);
         }
 
@@ -448,7 +448,7 @@ namespace NAuth.Test.Domain.Services
         public async Task Update_WithNonExistentUser_ShouldThrowException()
         {
             // Arrange
-            var user = new UserInfo
+            var user = new UserUpdatedInfo
             {
                 UserId = 999L,
                 Name = "Test User",
@@ -462,7 +462,7 @@ namespace NAuth.Test.Domain.Services
             // Act & Assert
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _userService.Update(user));
-            Assert.Contains("Error updating user", exception.Message);
+            Assert.Contains("User not exists", exception.Message);
             _mockTransaction.Verify(t => t.Rollback(), Times.Once);
         }
 
@@ -473,7 +473,7 @@ namespace NAuth.Test.Domain.Services
             var mockExistingUser = new Mock<IUserModel>();
             mockExistingUser.SetupGet(m => m.UserId).Returns(2L);
 
-            var user = new UserInfo
+            var user = new UserUpdatedInfo
             {
                 UserId = 1L,
                 Name = "Test User",
@@ -492,7 +492,7 @@ namespace NAuth.Test.Domain.Services
             // Act & Assert
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _userService.Update(user));
-            Assert.Contains("Error updating user", exception.Message);
+            Assert.Contains("User with email already registered", exception.Message);
             _mockTransaction.Verify(t => t.Rollback(), Times.Once);
         }
 
@@ -503,7 +503,7 @@ namespace NAuth.Test.Domain.Services
             var mockPhoneModel = new Mock<IUserPhoneModel>();
             var mockAddressModel = new Mock<IUserAddressModel>();
 
-            var user = new UserInfo
+            var user = new UserUpdatedInfo
             {
                 UserId = 1L,
                 Name = "Updated User",

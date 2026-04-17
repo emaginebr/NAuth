@@ -43,14 +43,24 @@ namespace NAuth.ACL
             try
             {
                 var authHeaderValue = Request.Headers["Authorization"].ToString();
+                if (string.IsNullOrEmpty(authHeaderValue))
+                {
+                    Logger.LogWarning("Authentication failed: Authorization header is missing for path {Path}", Request.Path);
+                    return Task.FromResult(AuthenticateResult.Fail("Missing Authorization Header"));
+                }
                 if (string.IsNullOrWhiteSpace(authHeaderValue))
                 {
-                    Logger.LogWarning("Authentication failed: Authorization header is empty for path {Path}", Request.Path);
+                    Logger.LogWarning("Authentication failed: Authorization header has no token for path {Path}", Request.Path);
                     return Task.FromResult(AuthenticateResult.Fail("Missing Authorization Token"));
                 }
 
                 var authHeader = AuthenticationHeaderValue.Parse(authHeaderValue);
                 var token = authHeader.Parameter;
+                if (string.IsNullOrWhiteSpace(token))
+                {
+                    Logger.LogWarning("Authentication failed: Authorization scheme present but token is empty for path {Path}", Request.Path);
+                    return Task.FromResult(AuthenticateResult.Fail("Missing Authorization Token"));
+                }
 
                 var jwtSecret = ResolveJwtSecret(token);
                 if (string.IsNullOrEmpty(jwtSecret))

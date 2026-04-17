@@ -10,6 +10,15 @@ post {
   auth: bearer
 }
 
+headers {
+  X-Tenant-Id: fortuno
+  ~X-Tenant-Id: emagine
+  ~X-Tenant-Id: viralt
+  ~X-Tenant-Id: devblog
+  ~X-Tenant-Id: bazzuca
+  ~X-Tenant-Id: monexup
+}
+
 auth:bearer {
   token: {{token}}
 }
@@ -17,19 +26,37 @@ auth:bearer {
 body:json {
   {
     "userId": 1,
-    "slug": "john-doe",
+    "slug": "rodrigo-landim",
     "imageUrl": "",
-    "name": "John Doe Updated",
-    "email": "john@example.com",
-    "hash": "",
-    "isAdmin": false,
-    "birthDate": "1990-01-01",
-    "idDocument": "",
-    "pixKey": "",
-    "password": "",
+    "name": "Rodrigo Landim",
+    "email": "rodrigo@emagine.com.br",
+    "isAdmin": true,
+    "birthDate": null,
+    "idDocument": null,
+    "pixKey": null,
+    "password": null,
     "status": 1,
-    "roles": [],
-    "phones": [],
-    "addresses": []
+    "roles": [
+      {
+        "roleId": 1,
+        "slug": "administrator",
+        "name": "Administrator"
+      }
+    ],
+    "phones": [
+      {
+        "phone": "61998752588"
+      }
+    ],
+    "addresses": [
+      {
+        "zipCode": "73252900",
+        "address": "Condomínio RK",
+        "complement": "Conj. Centauros Qd N Casa 42",
+        "neighborhood": "Sobradinho",
+        "city": "Brasília",
+        "state": "DF"
+      }
+    ]
   }
 }

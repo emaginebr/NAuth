@@ -375,7 +375,7 @@ namespace NAuth.Test.ACL
         {
             // Arrange
             var token = "valid-token";
-            var user = new UserInfo
+            var user = new UserUpdatedInfo
             {
                 UserId = 1L,
                 Name = "Updated User",

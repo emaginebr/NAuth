@@ -345,7 +345,7 @@ public interface IUserClient
 
     // User Management
     Task<UserInfo?> InsertAsync(UserInsertedInfo user);
-    Task<UserInfo?> UpdateAsync(UserInfo user, string token);
+    Task<UserInfo?> UpdateAsync(UserUpdatedInfo user, string token);
 
     // Authentication
     Task<UserTokenResult?> LoginWithEmailAsync(LoginParam param);
