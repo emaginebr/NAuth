@@ -61,6 +61,8 @@ jobs:
             BAZZUCA_JWT_SECRET=${{ secrets.BAZZUCA_JWT_SECRET }}
             MONEXUP_CONNECTION_STRING=${{ secrets.MONEXUP_CONNECTION_STRING }}
             MONEXUP_JWT_SECRET=${{ secrets.MONEXUP_JWT_SECRET }}
+            FORTUNO_CONNECTION_STRING=${{ secrets.FORTUNO_CONNECTION_STRING }}
+            FORTUNO_JWT_SECRET=${{ secrets.FORTUNO_JWT_SECRET }}
             ENVEOF
 
             sed -i 's/^[[:space:]]*//' .env.prod
