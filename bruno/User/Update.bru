@@ -10,6 +10,15 @@ post {
   auth: bearer
 }
 
+headers {
+  X-Tenant-Id: fortuno
+  ~X-Tenant-Id: emagine
+  ~X-Tenant-Id: viralt
+  ~X-Tenant-Id: devblog
+  ~X-Tenant-Id: bazzuca
+  ~X-Tenant-Id: monexup
+}
+
 auth:bearer {
   token: {{token}}
 }
@@ -21,7 +30,6 @@ body:json {
     "imageUrl": "",
     "name": "Rodrigo Landim",
     "email": "rodrigo@emagine.com.br",
-    "hash": "pU8MILkTP95axC7-02EyMt2cA6fTNsSv-IK5z6KrbG7iS6n76c8VDVsq39pRVy319DorstlJ5Gy06WByFpqRTSEfmMmSWylIWXV2",
     "isAdmin": true,
     "birthDate": null,
     "idDocument": null,
@@ -48,8 +56,6 @@ body:json {
         "city": "Brasília",
         "state": "DF"
       }
-    ],
-    "createAt": "2026-04-17T00:00:00",
-    "updateAt": "2026-04-17T14:09:09.604954"
+    ]
   }
 }

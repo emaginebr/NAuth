@@ -5,29 +5,27 @@ using System.Text.Json.Serialization;
 
 namespace NAuth.DTO.User
 {
-    public class UserInfo
+    public class UserUpdatedInfo
     {
         [JsonPropertyName("userId")]
         public long UserId { get; set; }
         [JsonPropertyName("slug")]
-        public string Slug { get; set; }
+        public string? Slug { get; set; }
         [JsonPropertyName("imageUrl")]
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
         [JsonPropertyName("name")]
         public string Name { get; set; }
         [JsonPropertyName("email")]
         public string Email { get; set; }
-        [JsonPropertyName("hash")]
-        public string Hash { get; set; }
         [JsonPropertyName("isAdmin")]
         public bool IsAdmin { get; set; }
         [JsonPropertyName("birthDate")]
         [JsonConverter(typeof(NullableDateTimeConverter))]
         public DateTime? BirthDate { get; set; }
         [JsonPropertyName("idDocument")]
-        public string IdDocument { get; set; }
+        public string? IdDocument { get; set; }
         [JsonPropertyName("pixKey")]
-        public string PixKey { get; set; }
+        public string? PixKey { get; set; }
         [JsonPropertyName("status")]
         public int Status { get; set; }
         [JsonPropertyName("roles")]
@@ -36,9 +34,5 @@ namespace NAuth.DTO.User
         public IList<UserPhoneInfo> Phones { get; set; }
         [JsonPropertyName("addresses")]
         public IList<UserAddressInfo> Addresses { get; set; }
-        [JsonPropertyName("createAt")]
-        public DateTime CreatedAt { get; set; }
-        [JsonPropertyName("updateAt")]
-        public DateTime UpdatedAt { get; set; }
     }
 }

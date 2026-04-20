@@ -149,7 +149,7 @@ namespace NAuth.ACL
             return result;
         }
 
-        public async Task<UserInfo?> UpdateAsync(UserInfo user, string token)
+        public async Task<UserInfo?> UpdateAsync(UserUpdatedInfo user, string token)
         {
             var url = $"{_nauthSetting.Value.ApiUrl}/User/update";
             _logger.LogInformation("UpdateAsync - Accessing URL: {Url}, UserId={UserId}", url, user?.UserId);

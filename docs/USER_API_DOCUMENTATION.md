@@ -24,7 +24,6 @@ Represents the full user profile returned by most endpoints.
   "birthDate": "1990-05-15T00:00:00",
   "idDocument": "123.456.789-00",
   "pixKey": "john.doe@example.com",
-  "password": null,
   "status": 1,
   "roles": [
     {
@@ -65,7 +64,6 @@ Represents the full user profile returned by most endpoints.
 | birthDate | DateTime? | Date of birth (nullable) |
 | idDocument | string | Identity document number (CPF) |
 | pixKey | string | PIX payment key |
-| password | string | Password (only used on input, null on output) |
 | status | int | User status code |
 | roles | RoleInfo[] | List of roles assigned to the user |
 | phones | UserPhoneInfo[] | List of phone numbers |
@@ -127,6 +125,46 @@ DTO used when creating a new user.
 | roles | RoleInfo[] | List of roles to assign |
 | phones | UserPhoneInfo[] | List of phone numbers |
 | addresses | UserAddressInfo[] | List of addresses |
+
+### UserUpdatedInfo
+
+DTO used when updating an existing user profile. `pixKey` and `idDocument` are optional;
+omitting them preserves the existing values. Password changes are not accepted here — use
+`ChangePasswordParam` / `ChangePasswordUsingHashParam` via their dedicated endpoints.
+
+```json
+{
+  "userId": 1,
+  "slug": "john-doe",
+  "imageUrl": "https://cdn.example.com/users/john-doe.jpg",
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "isAdmin": false,
+  "birthDate": "1990-05-15T00:00:00",
+  "idDocument": "123.456.789-00",
+  "pixKey": "john.doe@example.com",
+  "status": 1,
+  "roles": [],
+  "phones": [],
+  "addresses": []
+}
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| userId | long | User identifier to update (required, > 0) |
+| slug | string? | URL-friendly identifier (optional; regenerated if null/empty) |
+| imageUrl | string? | Profile image URL (optional) |
+| name | string | Full name (required) |
+| email | string | Email address (required) |
+| isAdmin | bool | Admin flag (only honored if requester is admin) |
+| birthDate | DateTime? | Date of birth |
+| idDocument | string? | CPF/CNPJ — optional; validated only when present |
+| pixKey | string? | PIX key — optional; preserved when omitted |
+| status | int | User status code |
+| roles | RoleInfo[] | Overrides role associations if present |
+| phones | UserPhoneInfo[] | Overrides phone list if present |
+| addresses | UserAddressInfo[] | Overrides address list if present |
 
 ### LoginParam
 
@@ -212,7 +250,6 @@ Paginated response wrapper for user search results.
       "birthDate": "1990-05-15T00:00:00",
       "idDocument": "123.456.789-00",
       "pixKey": "john.doe@example.com",
-      "password": null,
       "status": 1,
       "roles": [],
       "phones": [],
@@ -373,7 +410,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
   "birthDate": "1990-05-15T00:00:00",
   "idDocument": "123.456.789-00",
   "pixKey": "john.doe@example.com",
-  "password": null,
   "status": 1,
   "roles": [
     {
@@ -449,7 +485,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
   "birthDate": "1988-12-03T00:00:00",
   "idDocument": "321.654.987-00",
   "pixKey": "maria.silva@example.com",
-  "password": null,
   "status": 1,
   "roles": [
     {
@@ -520,7 +555,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
   "birthDate": "1990-05-15T00:00:00",
   "idDocument": "123.456.789-00",
   "pixKey": "john.doe@example.com",
-  "password": null,
   "status": 1,
   "roles": [],
   "phones": [],
@@ -571,7 +605,6 @@ GET /User/getBySlug/john-doe
   "birthDate": "1990-05-15T00:00:00",
   "idDocument": "123.456.789-00",
   "pixKey": "john.doe@example.com",
-  "password": null,
   "status": 1,
   "roles": [],
   "phones": [],
@@ -668,7 +701,6 @@ Content-Type: application/json
   "birthDate": null,
   "idDocument": null,
   "pixKey": null,
-  "password": null,
   "status": 1,
   "roles": [],
   "phones": [],
@@ -693,12 +725,15 @@ Content-Type: application/json
 ### 7. Update User
 
 Updates an existing user's profile. Users can only update their own profile unless they are admins.
+Accepts a `UserUpdatedInfo` payload where `pixKey` and `idDocument` are optional — when omitted,
+the existing values are preserved. The password **cannot** be changed via this endpoint; use
+`POST /User/changePassword` or `POST /User/changePasswordUsingHash` instead.
 
 **Endpoint:** `POST /User/update`
 
 **Authentication:** Required
 
-**Request Body:**
+**Request Body (UserUpdatedInfo):**
 ```json
 {
   "userId": 1,
@@ -706,12 +741,10 @@ Updates an existing user's profile. Users can only update their own profile unle
   "imageUrl": "https://cdn.example.com/users/john-doe-new.jpg",
   "name": "John Doe Updated",
   "email": "john.doe@example.com",
-  "hash": "a1b2c3d4e5f6",
   "isAdmin": false,
   "birthDate": "1990-05-15T00:00:00",
   "idDocument": "123.456.789-00",
   "pixKey": "john.doe@example.com",
-  "password": null,
   "status": 1,
   "roles": [
     {
@@ -734,9 +767,17 @@ Updates an existing user's profile. Users can only update their own profile unle
       "city": "São Paulo",
       "state": "SP"
     }
-  ],
-  "createAt": "2024-01-10T14:30:00",
-  "updateAt": "2025-03-20T09:15:00"
+  ]
+}
+```
+
+**Minimal payload** — only the fields you want to change are required (plus `userId`, `name`,
+`email`):
+```json
+{
+  "userId": 1,
+  "name": "John Doe",
+  "email": "john.doe@example.com"
 }
 ```
 
@@ -767,7 +808,6 @@ Content-Type: application/json
   "birthDate": "1990-05-15T00:00:00",
   "idDocument": "123.456.789-00",
   "pixKey": "john.doe@example.com",
-  "password": null,
   "status": 1,
   "roles": [],
   "phones": [],
@@ -847,7 +887,6 @@ User-Agent: Mozilla/5.0
     "birthDate": "1990-05-15T00:00:00",
     "idDocument": "123.456.789-00",
     "pixKey": "john.doe@example.com",
-    "password": null,
     "status": 1,
     "roles": [
       {
@@ -1075,7 +1114,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
     "birthDate": "1990-05-15T00:00:00",
     "idDocument": "123.456.789-00",
     "pixKey": "john.doe@example.com",
-    "password": null,
     "status": 1,
     "roles": [
       {
@@ -1113,7 +1151,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
     "birthDate": "1988-12-03T00:00:00",
     "idDocument": "321.654.987-00",
     "pixKey": null,
-    "password": null,
     "status": 1,
     "roles": [
       {
@@ -1187,7 +1224,6 @@ Content-Type: application/json
       "birthDate": "1990-05-15T00:00:00",
       "idDocument": "123.456.789-00",
       "pixKey": "john.doe@example.com",
-      "password": null,
       "status": 1,
       "roles": [
         {

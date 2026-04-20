@@ -191,7 +191,7 @@ namespace NAuth.API.Controllers
 
         [Authorize]
         [HttpPost("update")]
-        public async Task<ActionResult<UserInfo>> Update([FromBody] UserInfo user)
+        public async Task<ActionResult<UserInfo>> Update([FromBody] UserUpdatedInfo user)
         {
             try
             {

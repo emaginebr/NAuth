@@ -10,6 +10,15 @@ get {
   auth: bearer
 }
 
+headers {
+  X-Tenant-Id: fortuno
+  ~X-Tenant-Id: emagine
+  ~X-Tenant-Id: viralt
+  ~X-Tenant-Id: devblog
+  ~X-Tenant-Id: bazzuca
+  ~X-Tenant-Id: monexup
+}
+
 params:path {
   userId: 1
 }
